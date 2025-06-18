@@ -23,7 +23,19 @@ async function getAllUsers(){
     }
 }
 
+async function login(email, password) {
+    try {
+        const user = await User.LoginModel(email, password);
+        return user;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+    
+}
+
 module.exports = {
     getUserId,
-    getAllUsers
+    getAllUsers,
+    login
 };

@@ -1,32 +1,78 @@
-CREATE DATABASE checkin;
-use checkin;
+CREATE DATABASE checkin CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+USE checkin;
 
-
-CREATE TABLE clockin.empresa(
+CREATE TABLE empresa(
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     cnpj VARCHAR(20) UNIQUE NOT NULL,
     telefone VARCHAR(20) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     endereco VARCHAR(255) NOT NULL,
-    status int NOT NULL DEFAULT 0,
+    status INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE clockin.users(
-    id int AUTO_INCREMENT,
-    id_empresa int NOT NULL,
-    nome varchar(255) NOT NULL,
+CREATE TABLE configs(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_empresa INT NOT NULL,
+    nome VARCHAR(255) NOT NULL,
+    valor VARCHAR(255) NOT NULL,
+    FOREIGN KEY (id_empresa) REFERENCES empresa(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE users(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_empresa INT NOT NULL,
+    nome VARCHAR(255) NOT NULL,
     tipo ENUM('user', 'funcionario', 'admin') NOT NULL,
-    cpf varchar(14) UNIQUE NOT NULL,
-    telefone varchar(20) NOT NULL,
-    email varchar(255) UNIQUE NOT NULL,
-    senha varchar(64) NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (id_empresa) REFERENCES clockin.empresa(id),
+    cpf VARCHAR(14) UNIQUE NOT NULL,
+    telefone VARCHAR(20) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    senha VARCHAR(64) NOT NULL,
     CREATE_AT DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UPDATE_AT DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+    UPDATE_AT DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_empresa) REFERENCES empresa(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-drop table clockin.empresa;
+CREATE TABLE nominal(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    dia_semana ENUM('Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado') NOT NULL,
+    hora1 TIME DEFAULT '08:00:00',
+    hora2 TIME DEFAULT '12:00:00',
+    hora3 TIME DEFAULT '14:00:00',
+    hora4 TIME DEFAULT '18:00:00',
+    hora5 TIME,
+    hora6 TIME,
+    FOREIGN KEY (id_usuario) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE clockin.registros(
+    id int AUTO_INCREMENT,
+    id_usuario int NOT NULL,
+    data date NOT NULL,
+    registo1 time,
+    registo2 time,
+    registo3 time,
+    registo4 time,
+    registo5 time,
+    registo6 time,
+    obs text,
+    mode ENUM('Folga', 'Feriado', 'Feriado Meio', 'Folga bonificada'),
+    status ENUM('Aberto','Fechado') DEFAULT 'Aberto',
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_usuario) REFERENCES clockin.users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE clockin.saldo_diario(
+    id int AUTO_INCREMENT,
+    id_usuario int NOT NULL,
+    data date NOT NULL,
+    saldo50 int, 
+    saldo100 int,
+    saldo int, /*Saldo acumulado*/
+    mode ENUM('Aberto', 'Fechado'),
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_usuario) REFERENCES clockin.users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
