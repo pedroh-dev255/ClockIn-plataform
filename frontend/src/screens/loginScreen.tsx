@@ -148,7 +148,7 @@ export default function LoginPage() {
                             Entrar
                         </button>
                     </form>
-                    <p style={styles.footer}>© {new Date().getFullYear()} <a href='https://phsolucoes.space'>ClockIn!</a></p>
+                    <p style={styles.footer}>© {new Date().getFullYear()} <a href='${asd}'>ClockIn!</a></p>
                 </div>
             </div>
             ({loading &&
