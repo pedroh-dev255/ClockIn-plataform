@@ -1,50 +1,85 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
-import { login } from "../api/login.js";
+//componentes
+import Loader from '../components/Loader';
+
+//api
+import { validate } from '../api/validateToken';
+import { login } from "../api/login";
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
+    const [checkingAuth, setCheckingAuth] = useState(true);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const token = localStorage.getItem('token');
+            const userData = localStorage.getItem('userData');
+
+            if (!token || !userData) {
+                setCheckingAuth(false);
+                return;
+            }
+
+            const isValid = await validate(token);
+            if (isValid) {
+                navigate('/');
+            } else {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userData');
+            }
+            setCheckingAuth(false);
+        };
+
+        checkAuth();
+    }, [navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
-        // validação de dados:
         if (!email || !senha) {
-            toast.error('Preencha todos os campos');
+            toast.warning('Preencha todos os campos');
+            setLoading(false);
             return;
         }
 
-        if (email.indexOf('@') === -1 || email.indexOf('.') === -1) {
-            toast.error('E-mail inválido');
+        if (!email.includes('@') || !email.includes('.')) {
+            toast.warning('E-mail inválido');
+            setLoading(false);
             return;
         }
 
-        if (senha.length <= 7 ) {
-            toast.error('Senha deve ter pelo menos 8 caracteres');
+        if (senha.length < 8) {
+            toast.warning('Senha deve ter pelo menos 8 caracteres');
+            setLoading(false);
             return;
         }
 
         const result = await login(email, senha);
-        
         setLoading(false);
 
         if (result) {
-            if(result.success === true){
+            if (result.success === true) {
                 toast.success('Login realizado com sucesso');
-            }else{
-                toast.warning(result.message);
+                navigate('/');
+            } else {
+                toast.error(result.message);
             }
-        }else{
-            toast.error("Erro ao conectar ao servidor, Contate o Suporte");
+        } else {
+            toast.error("Erro ao conectar ao servidor. Contate o suporte.");
         }
-        
     };
+
+    if (checkingAuth) {
+        return <Loader />;
+    }
 
     const styles = {
         container: {
@@ -66,7 +101,7 @@ export default function LoginPage() {
             fontSize: '2rem',
             fontWeight: 700,
             color: '#1f2937',
-            textAlign: 'center' as React.CSSProperties['textAlign'],
+            textAlign: 'center',
             marginBottom: '1.5rem',
         } as React.CSSProperties,
         label: {
@@ -99,7 +134,7 @@ export default function LoginPage() {
             backgroundColor: '#1d4ed8',
         } as React.CSSProperties,
         footer: {
-            textAlign: 'center' as React.CSSProperties['textAlign'],
+            textAlign: 'center',
             fontSize: '0.85rem',
             color: '#6b7280',
             marginTop: '1rem',
@@ -109,7 +144,6 @@ export default function LoginPage() {
     return (
         <>
             <div style={styles.container}>
-                
                 <div style={styles.card}>
                     <h2 style={styles.title}>Entrar no Sistema</h2>
                     <form onSubmit={handleSubmit}>
@@ -148,14 +182,11 @@ export default function LoginPage() {
                             Entrar
                         </button>
                     </form>
-                    <p style={styles.footer}>© {new Date().getFullYear()} <a href='${asd}'>ClockIn!</a></p>
+                    <p style={styles.footer}>© {new Date().getFullYear()} ClockIn!</p>
                 </div>
             </div>
-            ({loading &&
-                <>
 
-                </>
-            })
+            {loading && <Loader />}
         </>
     );
 }

@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 import LoginPage from './screens/loginScreen';
 import DashboardPage from './screens/dashboard';
+import ConfigsScreen from './screens/configsScreen';
+
+import NotFoundRedirect from './screens/NotFoundRedirect';
+
 
 function LoadingScreen() {
   const [loading, setLoading] = useState(true);
@@ -10,21 +16,16 @@ function LoadingScreen() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('userData');
 
-    if (token) {
-      // Aqui você pode validar o token com sua API, se quiser
-      setAutenticado(true);
-    } else {
-      setAutenticado(false);
-    }
-
+    setAutenticado(!!(token && userData));
     setLoading(false);
   }, []);
 
   useEffect(() => {
     if (!loading) {
       if (autenticado) {
-        navigate('/dashboard');
+        navigate('/');
       } else {
         navigate('/login');
       }
@@ -42,9 +43,11 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoadingScreen />} />
         <Route path="/login" element={<LoginPage />} />
-        {/*<Route path="/dashboard" element={<DashboardPage />} />*/}
+        <Route path="/" element={<DashboardPage />} />
+        <Route path='/configs' element={<ConfigsScreen/>} />
+
+        <Route path="*" element={<NotFoundRedirect />}/>
       </Routes>
     </Router>
   );
