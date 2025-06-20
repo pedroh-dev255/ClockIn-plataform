@@ -45,7 +45,7 @@ async function loginController(req, res) {
 
         res.status(200).json({
             success: true,
-            return: user,
+            userData: user,
             token
         });
 

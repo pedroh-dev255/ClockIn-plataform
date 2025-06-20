@@ -1,4 +1,4 @@
-const { Create, GetAll, GetById } = require('../services/EmpresaService');
+const { Create, GetAll, GetById, GetByEmpresaId } = require('../services/EmpresaService');
 
 async function GetAllC(req,res) {
     try {
@@ -52,7 +52,35 @@ async function CreateC(req, res) {
 
 }
 
+async function GetByEmpresaIdC(req, res) {
+    const { id } = req.body;
+    if (!id) {
+        return res.status(400).json({
+            success: false,
+            message: 'Please provide an id'
+        });
+    }
+    try {
+        const response = await GetByEmpresaId(id);
+        
+        res.status(200).json({
+            success: true,
+            funcionarios: response
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching users'
+        });
+
+    } 
+    
+}
+
 module.exports = {
     GetAllC,
-    CreateC
+    CreateC,
+    GetByEmpresaIdC
 }

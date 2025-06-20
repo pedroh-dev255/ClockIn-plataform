@@ -1,4 +1,5 @@
-const Empresa = require('../models/Empresa.js')
+const Empresa = require('../models/Empresa.js');
+const User = require('../models/users.js');
 
 async function GetAll() {
     const [rows] = await Empresa.getAll();
@@ -17,9 +18,15 @@ async function Create(dados) {
     return result;
 }
 
+async function GetByEmpresaId(id) {
+    const rows = await User.getByEmpresaId(id);
+    return rows;
+}
+
 module.exports = {
     GetAll,
     GetById,
-    Create
+    Create,
+    GetByEmpresaId
 
 };

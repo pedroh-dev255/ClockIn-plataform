@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const regisRoutes  = require('./routes/regisRoute');
 const userRoutes = require('./routes/userRoute');
 const empRoutes = require('./routes/empRoute');
+const authMiddleware = require('./middlewares/authMiddleware');
 
 //configs
 const app = express();
@@ -31,7 +32,11 @@ app.use('/api/registros', regisRoutes);
 
 app.use('/api/emp', empRoutes);
 
-
+app.use('/api/validateToken', authMiddleware, (req, res) => {
+    res.status(200).json({
+      success: true,
+      message: 'Token is valid' });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

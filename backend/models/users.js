@@ -13,13 +13,24 @@ const User = {
         return rows[0];
     },
 
+    async getByEmpresaId(id) {
+        const [rows] = await db.query('SELECT id, nome, tipo, cargo, status, data_cadastro FROM users WHERE id_empresa = ?', [id]);
+        return rows;
+    },
 
     async create(user) {
-        const { name, email, password } = user;
-        const [result] = await db.query(
-            'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-            [name, email, password]
-        );
+        const { id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone, senha } = user;
+        if (tipo === 'admin') {
+            const [result] = await db.query(
+                'INSERT INTO users (id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone, senha) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone, senha]
+            );
+        }else {
+            const [result] = await db.query(
+                'INSERT INTO users (id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone]
+            );
+        }
         return { id: result.insertId, ...user };
     },
 
