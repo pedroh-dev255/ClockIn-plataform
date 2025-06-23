@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -23,7 +23,9 @@ export default function ConfigsScreen() {
     const userData = localStorage.getItem('userData') || '';
 
     useEffect(() => {
+        
         const checkAuth = async () => {
+            setLoading(true);
             if (!token || !userData) {
                 setIsAuthenticated(false);
                 return;
@@ -31,6 +33,7 @@ export default function ConfigsScreen() {
 
             const isValid = await validate(token);
             setIsAuthenticated(isValid);
+            setLoading(false);
         };
 
         checkAuth();

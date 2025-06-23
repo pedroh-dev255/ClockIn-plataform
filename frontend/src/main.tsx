@@ -1,6 +1,5 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 import App from './App.tsx'
 import "./index.css";
@@ -9,6 +8,6 @@ import "./index.css";
 createRoot(document.getElementById('root')!).render(
   <>
     <ToastContainer />
-    <App />,
+    <App />
   </>
 )

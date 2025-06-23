@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FaHome, FaUserFriends, FaCogs, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaHome, FaCogs, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import icon from '../assets/fav.png';
 
@@ -9,7 +9,7 @@ export default function Navbar() {
 
     const items = [
         { label: 'Home', icon: <FaHome />, path: '/' },
-        { label: 'Configurações', icon: <FaCogs />, path: '/configs' },
+        { label: 'Configurações', icon: <FaCogs />, path: '/configs' }
     ];
 
     const handleNavClick = (path: string) => {

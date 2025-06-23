@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 //componentes
 import Loader from '../components/Loader';
+import Esqueci from '../components/Esqueci';
 
 //api
 import { validate } from '../api/validateToken';
@@ -14,6 +15,7 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
+    const [esqueci, setEsqueci] = useState(false);
     const [checkingAuth, setCheckingAuth] = useState(true);
     const navigate = useNavigate();
 
@@ -56,20 +58,26 @@ export default function LoginPage() {
             return;
         }
 
-        if (senha.length < 8) {
-            toast.warning('Senha deve ter pelo menos 8 caracteres');
-            setLoading(false);
-            return;
+        if(senha !== "PADRAO"){
+            if (senha.length < 8) {
+                toast.warning('Senha deve ter pelo menos 8 caracteres');
+                setLoading(false);
+                return;
+            }
         }
 
         const result = await login(email, senha);
         setLoading(false);
 
         if (result) {
-            if (result.success === true) {
+            if (result.success === true && result.resetPassword === false) {
                 toast.success('Login realizado com sucesso');
                 navigate('/');
-            } else {
+            } else if (result.success === true && result.resetPassword === true) {
+                toast.info('Por favor, redefina sua senha');
+                navigate('/reset-password');
+
+            }else {
                 toast.error(result.message);
             }
         } else {
@@ -183,10 +191,20 @@ export default function LoginPage() {
                         </button>
                     </form>
                     <p style={styles.footer}>© {new Date().getFullYear()} ClockIn!</p>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                        <a
+                            style={{ ...styles.footer, color: '#2563eb', cursor: 'pointer', margin: 0 }}
+                            onClick={() => setEsqueci(true)}
+                        >
+                            Esqueci minha Senha
+                        </a>
+                    </div>
                 </div>
             </div>
 
             {loading && <Loader />}
+            {esqueci && <Esqueci onClose={() => setEsqueci(false)} setLoading={setLoading} />}
+
         </>
     );
 }

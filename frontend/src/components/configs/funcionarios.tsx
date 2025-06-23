@@ -1,19 +1,23 @@
 import type { CSSProperties } from 'react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
-import { getFuncionarios } from '../../api/configs/funcionarios';
+import { getFuncionarios, cadastroHandler } from '../../api/configs/funcionarios';
 
 import Loader from '../Loader';
 
 export default function FuncionariosPanel() {
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [selectedFuncionario, setSelectedFuncionario] = useState<any | null>(null);
+    const [tipoFuncionario, setTipoFuncionario] = useState('');
     const [funcionarios, setFuncionarios] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
     // carregar dados do usário
-    const token = localStorage.getItem('token');
+    //const token = localStorage.getItem('token');
     const userDataString = localStorage.getItem('userData');
-    const userData = userDataString ? JSON.parse(userDataString) : null;
+    //const userData = userDataString ? JSON.parse(userDataString) : null;
     
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState('ativo');
@@ -36,6 +40,7 @@ export default function FuncionariosPanel() {
                 if (response === false) {
                     toast.error("Token inválido ou expirado");
                     setFuncionarios([]);
+                    navigate('/login');
                     return;
                 }
 
@@ -60,10 +65,18 @@ export default function FuncionariosPanel() {
         fetchFuncionarios();
     }, []);
 
+    const resetFrom = () => {
+        setSelectedFuncionario(null);
+        setTipoFuncionario('');
+        setSearchTerm('');
+        setFilter('ativo');
+    };
+
 
 
     const funcionariosFiltrados = funcionarios.filter(f =>
-        filter === 'todos' ? true : f.status === filter
+        (filter === 'todos' ? true : f.status === filter) &&
+        f.nome.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -80,12 +93,21 @@ export default function FuncionariosPanel() {
                         <option value="desligado">Desligados</option>
                     </select>
 
-                    <button style={styles.button} onClick={() => setShowRegisterModal(true)}>
-                        + Cadastrar Funcionário
-                    </button>
+                    <input
+                        type="text"
+                        style={styles.inputFilter}
+                        name="filtrarFun"
+                        placeholder="Buscar Funcionário"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                    />
                 </div>
 
                 <div style={styles.cardGrid}>
+                    <button style={styles.button} onClick={() => setShowRegisterModal(true)}>
+                        + Cadastrar Funcionário
+                    </button>
+
                     {funcionariosFiltrados.map((func) => (
                         <div
                             key={func.id}
@@ -99,23 +121,121 @@ export default function FuncionariosPanel() {
                             </span>
                         </div>
                     ))}
+                    
                 </div>
 
                 {/* Modal de cadastro */}
                 {showRegisterModal && (
                     <div style={styles.modalOverlay}>
                         <div style={styles.modal}>
-                            <h2>Cadastrar Funcionário</h2>
-                            <input placeholder="Nome completo" style={styles.input} />
-                            <input placeholder="CPF" style={styles.input} />
-                            <input placeholder="Email" style={styles.input} />
-                            <input placeholder="Telefone" style={styles.input} />
-                            <input placeholder="Cargo" style={styles.input} />
+                            <form
+                                onSubmit={async (e) => {
+                                    e.preventDefault();
+                                    const form = e.target as HTMLFormElement;
+                                    const formData = new FormData(form);
+                                    try {
+                                        const returnCad = await cadastroHandler(formData);
+                                        if (returnCad) {
+                                            setShowRegisterModal(false);
+                                            resetFrom();
+                                        } else {
+                                            toast.error('Erro ao cadastrar funcionário');
+                                        }
+                                    } catch (error) {
+                                        toast.error('Erro ao cadastrar funcionário');
+                                    }
+                                }}
+                            >
+                                <h2>Cadastrar Funcionário</h2>
+                                <input name='nome' placeholder="Nome completo" style={styles.input} required />
+                                <input
+                                    type="hidden"
+                                    name="id_empresa"
+                                    value={userDataString ? JSON.parse(userDataString).id_empresa : ''}
+                                />
+                                <input
+                                    id='cpf'
+                                    name='cpf'
+                                    placeholder="CPF"
+                                    style={styles.input}
+                                    required
+                                    maxLength={14}
+                                    onChange={e => {
+                                        let value = e.target.value.replace(/\D/g, '');
+                                        if (value.length > 11) value = value.slice(0, 11);
+                                        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                                        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                                        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                                        e.target.value = value;
+                                    }}
+                                    onBlur={e => {
+                                        const cpf = e.target.value.replace(/\D/g, '');
+                                        function validarCPF(cpf: string) {
+                                            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+                                            let soma = 0, resto;
+                                            for (let i = 1; i <= 9; i++) soma += parseInt(cpf[i - 1]) * (11 - i);
+                                            resto = (soma * 10) % 11;
+                                            if (resto === 10 || resto === 11) resto = 0;
+                                            if (resto !== parseInt(cpf[9])) return false;
+                                            soma = 0;
+                                            for (let i = 1; i <= 10; i++) soma += parseInt(cpf[i - 1]) * (12 - i);
+                                            resto = (soma * 10) % 11;
+                                            if (resto === 10 || resto === 11) resto = 0;
+                                            if (resto !== parseInt(cpf[10])) return false;
+                                            return true;
+                                        }
+                                        if (cpf && !validarCPF(cpf)) {
+                                            toast.error('CPF inválido');
+                                            e.target.focus();
+                                        }
+                                    }}
+                                />
+                                <input name='email' type='email' placeholder="Email" style={styles.input} required />
+                                <input
+                                    placeholder="Telefone"
+                                    name='telefone'
+                                    style={styles.input}
+                                    required
+                                    maxLength={15}
+                                    onChange={e => {
+                                        let value = e.target.value.replace(/\D/g, '');
+                                        if (value.length > 11) value = value.slice(0, 11);
+                                        if (value.length > 10) {
+                                            value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                                        } else if (value.length > 5) {
+                                            value = value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+                                        } else if (value.length > 2) {
+                                            value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                                        } else {
+                                            value = value.replace(/^(\d*)/, '($1');
+                                        }
+                                        e.target.value = value;
+                                    }}
+                                />
+                                <input name='cargo' placeholder="Cargo" style={styles.input} required />
+                                {/*
+                                    Exibe os campos de senha apenas se o tipo selecionado for "admin"
+                                */}
+                                <select
+                                    name="tipo"
+                                    required
+                                    style={styles.input}
+                                    value={tipoFuncionario}
+                                    onChange={e => setTipoFuncionario(e.target.value)}
+                                >
+                                    <option value="">Selecione o tipo de funcionario</option>
+                                    <option value="admin">Administrador - Tem acesso a este sistema</option>
+                                    <option value="funcionario">Funcionario Comum - Não tem acesso</option>
+                                </select>
+                                <p>Data de inicio do Funcionario</p>
+                                <input name='dt_inicio' type="date" placeholder='00/00/0000' style={styles.input} required />
+                                <br /><br />
 
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                                <button onClick={() => setShowRegisterModal(false)} style={styles.cancelBtn}>Cancelar</button>
-                                <button style={styles.confirmBtn}>Salvar</button>
-                            </div>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                                    <button onClick={() => setShowRegisterModal(false)} style={styles.cancelBtn}>Cancelar</button>
+                                    <button type='submit' style={styles.confirmBtn}>Salvar</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 )}
@@ -127,14 +247,9 @@ export default function FuncionariosPanel() {
                             <h2>{selectedFuncionario.nome}</h2>
                             <p><b>Cargo:</b> {selectedFuncionario.cargo}</p>
                             <p><b>Status:</b> {selectedFuncionario.status}</p>
-
-                            <h3>Registros de Ponto (Hoje)</h3>
-                            <ul>
-                                <li>08:00 - Entrada</li>
-                                <li>12:00 - Saída Almoço</li>
-                                <li>13:00 - Retorno</li>
-                                <li>17:00 - Saída</li>
-                            </ul>
+                            <p><b>Data Cadastro:</b> {selectedFuncionario.data_cadastro ? new Date(selectedFuncionario.data_cadastro).toLocaleDateString('pt-BR') : ''}</p>
+                            <p><b>Data Demissão:</b> {selectedFuncionario.data_demissao ? selectedFuncionario.data_demissao : 'Cadastro ativo' } </p>
+                            <p><b>CPF:</b> {selectedFuncionario.cpf}</p>
 
                             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <button onClick={() => setSelectedFuncionario(null)} style={styles.cancelBtn}>Fechar</button>
@@ -164,8 +279,8 @@ const styles = {
     } as CSSProperties,
 
     button: {
-        backgroundColor: '#2563eb',
-        color: '#fff',
+        backgroundColor: '#dde8ff',
+        color: 'black',
         padding: '10px 16px',
         border: 'none',
         borderRadius: '6px',
@@ -212,6 +327,15 @@ const styles = {
 
     input: {
         width: '100%',
+        padding: '10px',
+        margin: '10px 0',
+        border: '1px solid #ccc',
+        borderRadius: '6px',
+    } as CSSProperties,
+
+    inputFilter: {
+        width: '100%',
+        maxWidth: '40%',
         padding: '10px',
         margin: '10px 0',
         border: '1px solid #ccc',

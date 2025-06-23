@@ -18,6 +18,9 @@ export async function login(email: string, password: string)  {
         });
 
         if(response.data.success === true){
+            if (response.data.userData.tipo !== 'admin') {
+                return { success: false, message: "Apenas administradores podem acessar o sistema" };
+            }
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('userData', JSON.stringify(response.data.userData));
         }

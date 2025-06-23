@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 
 import LoginPage from './screens/loginScreen';
 import DashboardPage from './screens/dashboard';

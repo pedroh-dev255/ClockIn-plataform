@@ -17,7 +17,8 @@ export const getFuncionarios = async (id: number) => {
 
     if(response.status == 401){
         console.log('Token invalido');
-
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
         return false;
     }
     return response.data;
@@ -27,4 +28,28 @@ export const getFuncionarios = async (id: number) => {
 
     throw error;
   }
+};
+
+export const cadastroHandler = async (formData: FormData) => {
+  const plainData: any = {};
+
+  formData.forEach((value, key) => {
+    plainData[key] = value;
+  });
+
+  console.log('Dados recebidos no cadastroHandler:', plainData);
+
+  // Agora você pode enviar os dados com axios:
+  const response = await axios.post(
+    `${API_URL}/api/users/register`,
+    plainData,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    }
+  );
+
+  return response.data;
 };
