@@ -29,6 +29,7 @@ CREATE TABLE users(
     tipo ENUM('user', 'funcionario', 'admin') NOT NULL,
     cargo VARCHAR(100) NOT NULL,
     data_cadastro DATE NOT NULL,
+    data_demissao DATE,
     cpf VARCHAR(14) UNIQUE NOT NULL,
     telefone VARCHAR(20) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,

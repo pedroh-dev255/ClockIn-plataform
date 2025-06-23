@@ -34,8 +34,21 @@ async function login(email, password) {
     
 }
 
+async function createUser(user) {
+    try {
+        const newUser = await User.create(user);
+
+        return newUser;
+    }
+    catch (error) {
+        console.error(error);
+        throw new Error(error.message || 'Erro ao criar usuário');
+    }
+}
+
 module.exports = {
     getUserId,
     getAllUsers,
-    login
+    login,
+    createUser
 };

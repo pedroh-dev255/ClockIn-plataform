@@ -1,4 +1,4 @@
-const { getUserId, getAllUsers, login } = require('../services/UsersService.js');
+const { getUserId, getAllUsers, login, createUser } = require('../services/UsersService.js');
 const jwt = require('jsonwebtoken');
 
 
@@ -40,19 +40,47 @@ async function loginController(req, res) {
         const token = jwt.sign(
             { id: user.id, email: user.email },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' } 
+            { expiresIn: '6h' } 
         );
+
 
         res.status(200).json({
             success: true,
             userData: user,
+            resetPassword: false,
             token
         });
+        
 
     } catch (error) {
         res.status(500).json({
             success: false,
             message: 'Error fetching users'
+        });
+    }
+}
+
+async function Register(req, res) {
+    const {id_empresa, nome, tipo, cargo, email, cpf, data_cadastro, telefone} = req.body;
+
+    if (!id_empresa || !nome || !tipo || !cargo || !email || !cpf || !data_cadastro || !telefone) {
+        return res.status(400).json({
+            success: false,
+            message: 'Preencha todos os campos obrigatórios'
+        });
+    }
+
+    try {
+        const newUser = await createUser({id_empresa, nome, tipo, cargo, email, cpf, data_cadastro, telefone});
+
+        res.status(201).json({
+            success: true,
+            userData: newUser
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao criar usuário: ' + error.message
         });
     }
 }
@@ -86,5 +114,6 @@ async function getUserById(req, res) {
 module.exports = {
     getAll,
     getUserById,
-    loginController
+    loginController,
+    Register
 };

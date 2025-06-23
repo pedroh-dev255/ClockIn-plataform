@@ -7,6 +7,10 @@ const User = {
         return rows;
     },
 
+    async getByEmail(email) {
+        const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        return rows[0];
+    },
 
     async getById(id) {
         const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
@@ -14,24 +18,27 @@ const User = {
     },
 
     async getByEmpresaId(id) {
-        const [rows] = await db.query('SELECT id, nome, tipo, cargo, status, data_cadastro FROM users WHERE id_empresa = ?', [id]);
+        const [rows] = await db.query('SELECT id, cpf, email, nome, tipo, cargo, status, data_cadastro, data_demissao FROM users WHERE id_empresa = ?', [id]);
         return rows;
     },
 
     async create(user) {
-        const { id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone, senha } = user;
-        if (tipo === 'admin') {
+        const { id_empresa, nome, tipo, cargo, email, cpf, data_cadastro, telefone } = user;
+        try {
             const [result] = await db.query(
-                'INSERT INTO users (id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone, senha) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone, senha]
+                'INSERT INTO users (id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone) VALUES (?, ?, "ativo", ?, ?, ?, ?, ?, ?)',
+                [id_empresa, nome, tipo, cargo, email, cpf, data_cadastro, telefone]
             );
-        }else {
-            const [result] = await db.query(
-                'INSERT INTO users (id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone]
-            );
+            
+            return { id: result.insertId, ...user };
+            
+        } catch (error) {
+            console.error('Error creating user:', error);
+
+            throw new Error(error.message || 'Erro ao criar usuário');
+            
         }
-        return { id: result.insertId, ...user };
+        
     },
 
 
@@ -69,6 +76,18 @@ const User = {
         // Remove password before returning user object
         const { password: _, senha: __, ...userWithoutPassword } = user;
         return userWithoutPassword;
+    },
+
+    async UpdateSenha(id, password) {
+        const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+        const user = rows[0];
+        if (!user) {
+            return null;
+        }
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        await db.query('UPDATE users SET senha = ? WHERE id = ?', [hashedPassword, id]);
+        return { id };
     }
 };
 
