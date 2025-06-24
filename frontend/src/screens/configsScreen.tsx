@@ -12,6 +12,7 @@ import Loader from '../components/Loader';
 import Navbar from '../components/Navbar';
 
 import FuncionariosPanel from '../components/configs/funcionarios';
+import EmpresaPanel from '../components/configs/empresa';
 
 export default function ConfigsScreen() {
     const navigate = useNavigate();
@@ -79,10 +80,8 @@ export default function ConfigsScreen() {
                         {/* Chama a função que renderiza o conteúdo da aba selecionada */}
                         {activeTab === 'funcionarios' && <FuncionariosPanel />}
 
-                        {activeTab === 'empresa' &&
-                            <h2>Dados da Empresa</h2>
+                        {activeTab === 'empresa' && <EmpresaPanel />}
                             
-                        }
                         {activeTab === 'ponto' &&
                             <h2>Configurações do ponto</h2>
                             
