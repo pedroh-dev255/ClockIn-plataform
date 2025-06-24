@@ -1,4 +1,4 @@
-const { Create, GetAll, GetById, GetByEmpresaId } = require('../services/EmpresaService');
+const { Create, GetAll, GetById, GetByEmpresaId, Update } = require('../services/EmpresaService');
 
 async function GetAllC(req,res) {
     try {
@@ -47,9 +47,67 @@ async function CreateC(req, res) {
             message: error.message
         });
     }
+}
 
+async function GetByIdC(req, res) {
+    // http://localhost:3500/api/emp/getByEmpresaId?id=1
     
+    const id = req.query.id;
+    if (!id) {
+        return res.status(400).json({
+            success: false,
+            message: 'Please provide an id'
+        });
+    }
+    try {
+        const response = await GetById(id);
+        
+        res.status(200).json({
+            success: true,
+            empresa: response
+        });
 
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching empresa data' + error.message
+        });
+
+    }
+}
+
+async function UpdateC(req, res) {
+    const {id, nome, email, telefone} = req.body;
+
+    if(!id){
+        return res.status(400).json({
+            success: false,
+            message: 'ID é obrigatório'
+        });
+    }
+
+    if(!nome || !email || !telefone) {
+        return res.status(400).json({
+            success: false,
+            message: 'Preencha todos os campos obrigatórios'
+        });
+    }
+
+    const dados = {id, nome, email, telefone};   
+    try {
+        const response = await Update(dados);
+        res.status(200).json({
+            success: true,
+            data: response
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating empresa: ' + error.message
+        });
+    }
 }
 
 async function GetByEmpresaIdC(req, res) {
@@ -82,5 +140,7 @@ async function GetByEmpresaIdC(req, res) {
 module.exports = {
     GetAllC,
     CreateC,
-    GetByEmpresaIdC
+    GetByEmpresaIdC,
+    GetByIdC,
+    UpdateC
 }

@@ -8,11 +8,24 @@ CREATE TABLE empresa(
     cnpj VARCHAR(20) UNIQUE NOT NULL,
     telefone VARCHAR(20) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    endereco VARCHAR(255) NOT NULL,
     status INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE clockin.endereco (
+    id INT AUTO_INCREMENT,
+    id_empresa INT NOT NULL UNIQUE,
+    rua VARCHAR(100) NOT NULL,
+    bairro VARCHAR(50) NOT NULL,
+    numero VARCHAR(10),
+    cep VARCHAR(9),
+    estado CHAR(2) NOT NULL,
+    cidade VARCHAR(50) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_empresa) REFERENCES empresa(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 CREATE TABLE configs(
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -67,7 +80,7 @@ CREATE TABLE clockin.registros(
     mode ENUM('Folga', 'Feriado', 'Feriado Meio', 'Folga bonificada'),
     status ENUM('Aberto','Fechado') DEFAULT 'Aberto',
     PRIMARY KEY (id),
-    FOREIGN KEY (id_usuario) REFERENCES clockin.users(id)
+    FOREIGN KEY (id_usuario) REFERENCES clockin.users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE clockin.saldo_diario(
@@ -79,5 +92,5 @@ CREATE TABLE clockin.saldo_diario(
     saldo int, /*Saldo acumulado*/
     mode ENUM('Aberto', 'Fechado'),
     PRIMARY KEY (id),
-    FOREIGN KEY (id_usuario) REFERENCES clockin.users(id)
+    FOREIGN KEY (id_usuario) REFERENCES clockin.users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

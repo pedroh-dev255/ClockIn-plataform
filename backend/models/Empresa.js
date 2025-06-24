@@ -9,7 +9,7 @@ const Empresa = {
     },
 
     async getById(id) {
-        const [rows] = await db.query('SELECT * FROM empresa WHERE id = ?', [id]);
+        const [rows] = await db.query('SELECT *, (select count(*) from clockin.users where users.id_empresa = empresa.id AND status = "ativo") as n_funcionarios FROM empresa INNER JOIN endereco ON endereco.id_empresa = empresa.id WHERE empresa.id = ?', [id]);
         return rows[0];
     },
 
@@ -62,6 +62,22 @@ const Empresa = {
         } finally {
             conn.release();
         }
+    },
+
+    async Update(dados) {
+        const { id, nome, telefone, email } = dados;
+        if (!id) {
+            throw new Error('ID é obrigatório');
+        }
+        try {
+            const response = await db.query(
+                'UPDATE empresa SET nome = ?, telefone = ?, email = ? WHERE id = ?',
+                [nome, telefone, email, id]);
+            return response;
+        } catch (error) {
+            throw new Error('Erro ao atualizar empresa: ' + error.message);
+        }
+
     }
 
 };

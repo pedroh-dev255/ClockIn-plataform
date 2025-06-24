@@ -8,7 +8,7 @@ async function GetAll() {
 }
 
 async function GetById(id) {
-    const [rows] = await Empresa.getById(id);
+    const rows = await Empresa.getById(id);
 
     return rows;
 }
@@ -23,10 +23,17 @@ async function GetByEmpresaId(id) {
     return rows;
 }
 
+async function Update(dados) {
+    const result = await Empresa.Update(dados);
+    return result;
+}
+
+
 module.exports = {
     GetAll,
     GetById,
     Create,
-    GetByEmpresaId
+    GetByEmpresaId,
+    Update
 
 };
