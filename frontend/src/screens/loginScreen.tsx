@@ -201,10 +201,8 @@ export default function LoginPage() {
                     </div>
                 </div>
             </div>
-
-            {loading && <Loader />}
             {esqueci && <Esqueci onClose={() => setEsqueci(false)} setLoading={setLoading} />}
-
+            {loading && <Loader />}
         </>
     );
 }
