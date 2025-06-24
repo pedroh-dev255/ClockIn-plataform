@@ -22,6 +22,27 @@ async function esqueciSenhaController(req, res) {
         });
     }
 
+    if (usuario.status !== 'ativo') {
+        return res.status(403).json({
+            success: false,
+            message: 'Usuário inativo, não é possível redefinir a senha'
+        });
+    }
+
+    if (usuario.tokenExpira && usuario.tokenExpira > Date.now()) {
+        return res.status(400).json({
+            success: false,
+            message: 'Já existe um token de redefinição de senha ativo. Por favor, aguarde até que ele expire.'
+        });
+    }
+
+    if (usuario.tipo !== 'admin') {
+        return res.status(403).json({   
+            success: false,
+            message: 'Apenas usuários administradores podem redefinir a senha'
+        });
+    }
+
     const token = crypto.randomBytes(32).toString('hex');
 
     usuario.resetToken = token;
@@ -71,10 +92,10 @@ async function esqueciSenhaController(req, res) {
                 font-size: 16px;
                 margin-bottom: 20px;
                 }
-                .button {
+                .buttonLink {
                 display: inline-block;
                 background-color: #7130FF;
-                color: white;
+                color: white !important;
                 padding: 15px 25px;
                 border-radius: 8px;
                 text-decoration: none;
@@ -101,7 +122,7 @@ async function esqueciSenhaController(req, res) {
                 <h1>Recuperação de Senha</h1>
                 <p>Você solicitou a redefinição da sua senha. Clique no botão abaixo para continuar com o processo:</p>
                 <p style="text-align: center;">
-                    <a href="${link}" class="button">Redefinir Senha</a>
+                    <a href="${link}" class="buttonLink">Redefinir Senha</a>
                 </p>
                 <p>Se você não solicitou essa alteração, ignore este e-mail. O link é válido por 1 hora.</p>
                 </div>

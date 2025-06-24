@@ -46,9 +46,21 @@ async function createUser(user) {
     }
 }
 
+async function desligamentoUser(userId, dataDemissao) {
+    try {
+        const result = await User.desligamento(userId, dataDemissao);
+        return result;
+    } catch (error) {
+        console.error(error);
+        throw new Error(error.message || 'Erro ao desligar usuário');
+    }
+    
+}
+
 module.exports = {
     getUserId,
     getAllUsers,
     login,
-    createUser
+    createUser,
+    desligamentoUser
 };

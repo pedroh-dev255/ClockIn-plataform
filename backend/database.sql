@@ -1,5 +1,6 @@
-CREATE DATABASE checkin CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-USE checkin;
+-- Active: 1750763277253@@127.0.0.1@3306
+CREATE DATABASE clockin CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+USE clockin;
 
 CREATE TABLE empresa(
     id INT AUTO_INCREMENT PRIMARY KEY,

@@ -1,4 +1,4 @@
-const { getUserId, getAllUsers, login, createUser } = require('../services/UsersService.js');
+const { getUserId, getAllUsers, login, createUser, desligamentoUser } = require('../services/UsersService.js');
 const jwt = require('jsonwebtoken');
 
 
@@ -61,9 +61,9 @@ async function loginController(req, res) {
 }
 
 async function Register(req, res) {
-    const {id_empresa, nome, tipo, cargo, email, cpf, data_cadastro, telefone} = req.body;
+    const {id_empresa, nome, tipo, cargo, email, cpf, dt_inicio, telefone} = req.body;
 
-    if (!id_empresa || !nome || !tipo || !cargo || !email || !cpf || !data_cadastro || !telefone) {
+    if (!id_empresa || !nome || !tipo || !cargo || !email || !cpf || !dt_inicio || !telefone) {
         return res.status(400).json({
             success: false,
             message: 'Preencha todos os campos obrigatórios'
@@ -71,18 +71,45 @@ async function Register(req, res) {
     }
 
     try {
-        const newUser = await createUser({id_empresa, nome, tipo, cargo, email, cpf, data_cadastro, telefone});
+        const newUser = await createUser({id_empresa, nome, tipo, cargo, email, cpf, dt_inicio, telefone});
 
         res.status(201).json({
             success: true,
             userData: newUser
         });
     } catch (error) {
+        console.error('Error creating user:', error);
         res.status(500).json({
             success: false,
             message: 'Erro ao criar usuário: ' + error.message
         });
     }
+}
+
+async function desligamento(req, res) {
+    const {id_funcionario, desligamento} = req.body;
+
+    if (!id_funcionario || !desligamento) {
+        return res.status(400).json({
+            success: false,
+            message: 'Preencha todos os campos obrigatórios'
+        });
+    }
+
+    try {
+        const result = await desligamentoUser(id_funcionario, desligamento);
+        res.status(200).json({
+            success: true,
+            return: result
+        });
+    } catch (error) {
+        console.error('Error desligando usuário:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao desligar usuário: ' + error.message
+        });
+    }
+    
 }
 
 
@@ -115,5 +142,6 @@ module.exports = {
     getAll,
     getUserById,
     loginController,
-    Register
+    Register,
+    desligamento
 };

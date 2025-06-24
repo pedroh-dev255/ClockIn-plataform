@@ -18,20 +18,20 @@ const User = {
     },
 
     async getByEmpresaId(id) {
-        const [rows] = await db.query('SELECT id, cpf, email, nome, tipo, cargo, status, data_cadastro, data_demissao FROM users WHERE id_empresa = ?', [id]);
+        const [rows] = await db.query('SELECT id, cpf, email, nome, tipo, telefone, cargo, status, data_cadastro, data_demissao FROM users WHERE id_empresa = ?', [id]);
         return rows;
     },
 
     async create(user) {
-        const { id_empresa, nome, tipo, cargo, email, cpf, data_cadastro, telefone } = user;
+        const { id_empresa, nome, tipo, cargo, email, cpf, dt_inicio, telefone } = user;
         try {
             const [result] = await db.query(
                 'INSERT INTO users (id_empresa, nome, status, tipo, cargo, email, cpf, data_cadastro, telefone) VALUES (?, ?, "ativo", ?, ?, ?, ?, ?, ?)',
-                [id_empresa, nome, tipo, cargo, email, cpf, data_cadastro, telefone]
+                [id_empresa, nome, tipo, cargo, email, cpf, dt_inicio, telefone]
             );
             
-            return { id: result.insertId, ...user };
-            
+            return result.insertId ? { id: result.insertId, ...user } : null;
+
         } catch (error) {
             console.error('Error creating user:', error);
 
@@ -39,6 +39,22 @@ const User = {
             
         }
         
+    },
+
+    async desligamento(id, data_demissao) {
+        const [rows] = await db.query('SELECT id, status FROM users WHERE id = ?', [id]);
+        const user = rows[0];   
+        if (!user) {
+            throw new Error('Erro usuario não existe');;
+        }
+        if (user.status !== 'ativo') {
+            throw new Error('Erro usuario já desligado');
+        }
+        
+        await db.query('UPDATE users SET status = "desligado", data_demissao = ? WHERE id = ?', [data_demissao, id]);
+        await db.query('UPDATE registros SET status = "Fechado" WHERE id_usuario = ?', [id]);
+        await db.query('UPDATE saldo_diario SET mode = "Fechado" WHERE id_usuario = ?', [id]);
+        return { id, data_demissao };
     },
 
 
@@ -89,6 +105,8 @@ const User = {
         await db.query('UPDATE users SET senha = ? WHERE id = ?', [hashedPassword, id]);
         return { id };
     }
+
+
 };
 
 module.exports = User;
