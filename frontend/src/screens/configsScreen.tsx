@@ -13,6 +13,7 @@ import Navbar from '../components/Navbar';
 
 import FuncionariosPanel from '../components/configs/funcionarios';
 import EmpresaPanel from '../components/configs/empresa';
+import ConfigsPanel from '../components/configs/configPonto';
 
 export default function ConfigsScreen() {
     const navigate = useNavigate();
@@ -82,10 +83,7 @@ export default function ConfigsScreen() {
 
                         {activeTab === 'empresa' && <EmpresaPanel />}
                             
-                        {activeTab === 'ponto' &&
-                            <h2>Configurações do ponto</h2>
-                            
-                    }
+                        {activeTab === 'ponto' && <ConfigsPanel />}
                     </div>
                 </div>
             </div>

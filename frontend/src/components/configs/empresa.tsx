@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-import { getEmpresa } from '../../api/configs/empresa';
+import { getEmpresa, Update } from '../../api/configs/empresa';
 import { validate } from '../../api/validateToken';
 import Loader from '../Loader';
 
@@ -12,6 +12,8 @@ export default function EmpresaPanel() {
     const [empresa, setEmpresa] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [edit, setEdit] = useState(false);
+    const [formData, setFormData] = useState<any>({});
+
 
     const userDataString = localStorage.getItem('userData');
 
@@ -80,7 +82,13 @@ export default function EmpresaPanel() {
         <>
             <div style={styles.container}>
                 <div style={{ textAlign: 'end', marginBottom: '24px' }}>
-                    <button onClick={() => setEdit(true)} style={{ padding: '8px', fontSize: '14px', borderRadius: '6px', border: '1px solid #ccc', }}>Editar</button>
+                    <button onClick={() =>{
+                        setEdit(true);
+                        setFormData({ ...empresa })
+                        ;}} style={{ padding: '8px', fontSize: '14px', borderRadius: '6px', border: '1px solid #ccc', }}
+                    >
+                        Editar
+                    </button>
                 </div>
                 <h2 style={styles.title}>Dados da Empresa</h2>
                 <div style={styles.grid}>
@@ -107,84 +115,213 @@ export default function EmpresaPanel() {
                 </div>
             </div>
             {edit && (
-                
                 <div style={styles.modalOverlay}>
                     <div style={styles.modal}>
                         <h1>Editar dados da Empresa</h1>
 
-                        <form onSubmit={async (e) => {
-                                e.preventDefault();
-                                const confirm = window.confirm("Tem certeza que deseja editar os dados da empresa?");
-                                if (!confirm) return;
-                                const form = e.target as HTMLFormElement;
-                                const formData = new FormData(form);
-                                setLoading(true);
-                                
-                            }}>
+                        <form
+                            onSubmit={async (e) => {
+                            e.preventDefault();
+                            const confirm = window.confirm("Tem certeza que deseja editar os dados da empresa?");
+                            if (!confirm) return;
+                            setLoading(true);
+                            try {
+                                const response = await Update(formData);
+                                if (response) {
+                                toast.success('Dados da empresa atualizados com sucesso!');
+                                setEmpresa(formData); // atualiza o estado principal
+                                setEdit(false);
+                                }
+                            } catch (error) {
+                                console.error('Erro ao editar dados da empresa:', error);
+                                toast.error('Erro ao editar dados da empresa');
+                            } finally {
+                                setLoading(false);
+                            }
+                            }}
+                        >
                             <br />
                             <label htmlFor="nome">Nome da Empresa:</label>
-                            <input type="text" id='nome' name="nome" style={styles.input}  value={empresa.nome} />
+                            <input
+                                type="text"
+                                id="nome"
+                                name="nome"
+                                style={styles.input}
+                                value={formData.nome || ''}
+                                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                            />
+
                             <label htmlFor="cnpj">CNPJ:</label>
                             <input
                                 type="text"
-                                style={styles.input}
-                                value={empresa.cnpj}
                                 id="cnpj"
+                                style={styles.input}
+                                value={formData.cnpj || ''}
                                 disabled
-                                title="O CNPJ identifica a empresa. Não pode ser alterado." 
+                                title="O CNPJ identifica a empresa. Não pode ser alterado."
                             />
+
                             <label htmlFor="email">Email:</label>
                             <input
                                 type="email"
+                                id="email"
                                 name="email"
-                                id='email'
                                 style={styles.input}
-                                value={empresa.email}
-                                title="O email é usado para comunicações com a empresa. Alterá-lo mudará o endereço de contato principal."
+                                value={formData.email || ''}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             />
+
                             <label htmlFor="telefone">Telefone:</label>
-                            <input type="text" id='telefone' name="telefone" style={styles.input} value={empresa.telefone} />
+                            <input
+                                type="text"
+                                id="telefone"
+                                name="telefone"
+                                style={styles.input}
+                                value={formData.telefone || ''}
+                                onChange={(e) => {
+                                    let value = e.target.value.replace(/\D/g, '');
+                                    if (value.length > 11) value = value.slice(0, 11);
+                                    if (value.length > 0) {
+                                        value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+                                        if (value.length > 10) {
+                                            value = value.replace(/(\d{5})(\d{4})$/, '$1-$2');
+                                        } else if (value.length > 9) {
+                                            value = value.replace(/(\d{4})(\d{4})$/, '$1-$2');
+                                        }
+                                    }
+                                    setFormData({ ...formData, telefone: value });
+                                }}
+                                maxLength={15}
+                                placeholder="(99) 99999-9999"
+                            />
+
                             <label htmlFor="endereco">Endereço:</label>
                             <div style={styles.enderecoContainer}>
-                                {/* endereço */}
-                                <div style={styles.divInputEnd}>
-                                    <label htmlFor="rua">Rua</label>
-                                    <input type="text" id='rua' name="rua" style={styles.inputEnd} placeholder='Rua' value={empresa.rua} />
-                                </div>
-
-                                <div style={styles.divInputEnd}>
-                                    <label htmlFor="numero">Número</label>
-                                    <input type="text" id='numero' name="numero" style={styles.inputEnd} placeholder='Número' value={empresa.numero} />
-                                </div>
-
-                                <div style={styles.divInputEnd}>
-                                    <label htmlFor="bairro">Bairro</label>
-                                    <input type="text" id='bairro' name="bairro" style={styles.inputEnd} placeholder='Bairro' value={empresa.bairro} />
-                                </div>
-
-                                <div style={styles.divInputEnd}>
-                                    <label htmlFor="cidade">Cidade</label>
-                                    <input type="text" id='cidade' name="cidade" style={styles.inputEnd} placeholder='Cidade' value={empresa.cidade} />
-                                </div>
-
-                                <div style={styles.divInputEnd}>
-                                    <label htmlFor="estado">Estado</label>
-                                    <input type="text" id='estado' name="estado" style={styles.inputEnd} placeholder='Estado' value={empresa.estado} />
-                                </div>
-                                
-                                <div style={styles.divInputEnd}>
-                                    <label htmlFor="cep">CEP</label>
-                                    <input type="text" id='cep' name='cep' style={styles.inputEnd} placeholder='CEP' value={empresa.cep} />
-                                </div>
+                            <div style={styles.divInputEnd}>
+                                <label htmlFor="rua">Rua</label>
+                                <input
+                                    type="text"
+                                    id="rua"
+                                    name="rua"
+                                    style={styles.inputEnd}
+                                    placeholder="Rua"
+                                    value={formData.rua || ''}
+                                    onChange={(e) => setFormData({ ...formData, rua: e.target.value })}
+                                />
                             </div>
-                            <div style={{ paddingTop: '50px', display: 'flex', justifyContent: 'space-between'}}>
-                                <button type='submit' style={styles.editarBtn}>Salvar Edição</button> 
-                                <button onClick={() => setEdit(false)} style={styles.cancelBtn}>Cancelar</button>
+
+                            <div style={styles.divInputEnd}>
+                                <label htmlFor="numero">Número</label>
+                                <input
+                                type="text"
+                                id="numero"
+                                name="numero"
+                                style={styles.inputEnd}
+                                placeholder="Número"
+                                value={formData.numero || ''}
+                                onChange={(e) => setFormData({ ...formData, numero: e.target.value })}
+                                />
+                            </div>
+
+                            <div style={styles.divInputEnd}>
+                                <label htmlFor="bairro">Bairro</label>
+                                <input
+                                    type="text"
+                                    id="bairro"
+                                    name="bairro"
+                                    style={styles.inputEnd}
+                                    placeholder="Bairro"
+                                    value={formData.bairro || ''}
+                                    onChange={(e) => setFormData({ ...formData, bairro: e.target.value })}
+                                />
+                            </div>
+
+                            <div style={styles.divInputEnd}>
+                                <label htmlFor="cidade">Cidade</label>
+                                <input
+                                    type="text"
+                                    id="cidade"
+                                    name="cidade"
+                                    style={styles.inputEnd}
+                                    placeholder="Cidade"
+                                    value={formData.cidade || ''}
+                                    onChange={(e) => setFormData({ ...formData, cidade: e.target.value })}
+                                />
+                            </div>
+
+                            <div style={styles.divInputEnd}>
+                                <label htmlFor="estado">Estado</label>
+                                <input
+                                    type="text"
+                                    id="estado"
+                                    name="estado"
+                                    style={styles.inputEnd}
+                                    placeholder="Estado (ex: SP)"
+                                    value={formData.estado || ''}
+                                    maxLength={2}
+                                    onChange={(e) => {
+                                        const value = e.target.value.toUpperCase();
+                                        const estadosValidos = [
+                                            "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
+                                            "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
+                                            "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+                                        ];
+                                        if (value === "" || estadosValidos.includes(value)) {
+                                            setFormData({ ...formData, estado: value });
+                                        } else {
+                                            setFormData({ ...formData, estado: value });
+                                        }
+                                    }}
+                                    pattern="AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO"
+                                    title="Digite a sigla de um estado brasileiro (ex: SP, RJ, TO)"
+                                    required
+                                />
+                                {formData.estado && ![
+                                    "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
+                                    "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
+                                    "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+                                ].includes(formData.estado.toUpperCase()) && (
+                                    <span style={{ color: 'red', fontSize: '12px' }}>
+                                        Estado inválido. Use a sigla (ex: SP, RJ, TO).
+                                    </span>
+                                )}
+                            </div>
+
+                            <div style={styles.divInputEnd}>
+                                <label htmlFor="cep">CEP</label>
+                                <input
+                                    type="text"
+                                    id="cep"
+                                    name="cep"
+                                    style={styles.inputEnd}
+                                    placeholder="CEP"
+                                    value={formData.cep || ''}
+                                    onChange={(e) => {
+                                        let value = e.target.value.replace(/\D/g, '');
+                                        if (value.length > 8) value = value.slice(0, 8);
+                                        if (value.length > 5) {
+                                            value = value.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
+                                        }
+                                        setFormData({ ...formData, cep: value });
+                                    }}
+                                    maxLength={9}
+                                />
+                            </div>
+                            </div>
+
+                            <div style={{ paddingTop: '50px', display: 'flex', justifyContent: 'space-between' }}>
+                                <button type="submit" style={styles.editarBtn}>
+                                    Salvar Edição
+                                </button>
+                                <button type="button" onClick={() => setEdit(false)} style={styles.cancelBtn}>
+                                    Cancelar
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
-            )}
+                )}
+
             {loading && <Loader />}
         </>
     );
