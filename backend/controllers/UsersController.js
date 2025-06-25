@@ -1,5 +1,6 @@
-const { getUserId, getAllUsers, login, createUser, desligamentoUser } = require('../services/UsersService.js');
+const { getUserId, getAllUsers, login, createUser, desligamentoUser, ResetSenha } = require('../services/UsersService.js');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 
 async function getAll(req, res) {
@@ -86,6 +87,33 @@ async function Register(req, res) {
     }
 }
 
+async function resetSenhaController(req, res) {
+    const { senha } = req.body;
+    
+    if (!senha || senha.length < 8) {
+        return res.status(400).json({ success: false, message: 'Senha inválida' });
+    }
+
+
+    try {
+        
+        const hashed = await bcrypt.hash(senha, 10);
+
+        const result = await ResetSenha(req.usuarioParaReset.id, hashed);
+        if (result.affectedRows === 0) {
+            throw new Error('Erro ao redefinir a senha do usuário');
+        }
+
+        return res.json({
+            success: true, message:
+            'Senha redefinida com sucesso!'
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Erro ao redefinir senha' });
+    }
+}
+
 async function desligamento(req, res) {
     const {id_funcionario, desligamento} = req.body;
 
@@ -143,5 +171,6 @@ module.exports = {
     getUserById,
     loginController,
     Register,
+    resetSenhaController,
     desligamento
 };

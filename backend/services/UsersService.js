@@ -57,10 +57,17 @@ async function desligamentoUser(userId, dataDemissao) {
     
 }
 
+async function ResetSenha(id, senha) {
+    const result = await User.resetarSenha(id,senha);
+    return result;
+    
+}
+
 module.exports = {
     getUserId,
     getAllUsers,
     login,
     createUser,
+    ResetSenha,
     desligamentoUser
 };

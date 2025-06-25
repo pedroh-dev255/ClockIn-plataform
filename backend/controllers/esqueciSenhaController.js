@@ -48,6 +48,19 @@ async function esqueciSenhaController(req, res) {
     usuario.resetToken = token;
     usuario.tokenExpira = Date.now() + 3600000;
 
+    try{
+        const result = await User.setResetToken(email, token, usuario.tokenExpira);
+        if (result.affectedRows === 0) {
+            throw new Error('Erro ao atualizar o token do usuário');
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar token:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro ao atualizar token'
+        });
+    }
+
     const link = `${process.env.FRONTEND_URL}/resetar-senha/${token}`;
 
     const html = `
@@ -135,7 +148,12 @@ async function esqueciSenhaController(req, res) {
             </html>
             `;
     try {
-        await sendEmail(email, 'Recupere sua senha', html);
+        const result = await sendEmail(email, 'Recupere sua senha', html);
+        if (result !== true) {
+            console.error('Erro ao enviar email:', result.message);
+            await User.setResetToken(email, null, null); // Limpa o token se falhar no envio
+            throw new Error('Erro ao enviar email');
+        }
 
         res.json({
             success: true,

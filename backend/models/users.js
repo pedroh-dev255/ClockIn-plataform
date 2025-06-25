@@ -41,6 +41,27 @@ const User = {
         
     },
 
+    async getByResetToken(token) {
+        const [result] = await db.query(
+            'SELECT * FROM users WHERE resetToken = ?',
+            [token]
+        );
+        return result[0] || null;
+    },
+
+    async setResetToken(email, token, tokenExpira) {
+        const [result] = await db.query(
+            'UPDATE users SET resetToken = ?, tokenExpira = ? WHERE email = ?',
+            [token, tokenExpira, email]
+        );
+        return result;
+    },
+
+    async resetarSenha(id, senha) {
+        const [result] = await db.query('UPDATE users SET senha = ?, resetToken = NULL, tokenExpira = NULL WHERE id = ?', [senha, id]);
+        return result;
+    },
+
     async desligamento(id, data_demissao) {
         const [rows] = await db.query('SELECT id, status FROM users WHERE id = ?', [id]);
         const user = rows[0];   
