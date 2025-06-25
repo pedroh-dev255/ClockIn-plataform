@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { getFuncionarios, cadastroHandler, desligamentoHandler } from '../../api/configs/funcionarios';
 
+import { validate } from '../../api/validateToken';
+
 import Loader from '../Loader';
 
 export default function FuncionariosPanel() {
@@ -22,6 +24,33 @@ export default function FuncionariosPanel() {
     
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState('ativo');
+
+    
+    useEffect(() => {
+        const checkAuth = async () => {
+            const token = localStorage.getItem('token');
+            const userData = localStorage.getItem('userData');
+
+            if (!token || !userData) {
+                toast.error("Token inválido ou expirado");
+                localStorage.removeItem('token');
+                localStorage.removeItem('userData');
+                navigate('/login');
+                return;
+            }
+
+            const isValid = await validate(token);
+            if (!isValid) {
+                toast.error("Token inválido ou expirado");
+                localStorage.removeItem('token');
+                localStorage.removeItem('userData');
+                navigate('/login');
+                return;
+            }
+        };
+
+        checkAuth();
+    }, [navigate]);
 
 
     useEffect(() => {

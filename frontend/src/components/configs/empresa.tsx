@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 import { getEmpresa } from '../../api/configs/empresa';
-
+import { validate } from '../../api/validateToken';
 import Loader from '../Loader';
 
 export default function EmpresaPanel() {
@@ -14,6 +14,32 @@ export default function EmpresaPanel() {
     const [edit, setEdit] = useState(false);
 
     const userDataString = localStorage.getItem('userData');
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const token = localStorage.getItem('token');
+            const userData = localStorage.getItem('userData');
+
+            if (!token || !userData) {
+                toast.error("Token inválido ou expirado");
+                localStorage.removeItem('token');
+                localStorage.removeItem('userData');
+                navigate('/login');
+                return;
+            }
+
+            const isValid = await validate(token);
+            if (!isValid) {
+                toast.error("Token inválido ou expirado");
+                localStorage.removeItem('token');
+                localStorage.removeItem('userData');
+                navigate('/login');
+                return;
+            }
+        };
+
+        checkAuth();
+    }, [navigate]);
 
     useEffect(() =>  {
         setLoading(true);
