@@ -78,8 +78,8 @@ async function GetByIdC(req, res) {
 }
 
 async function UpdateC(req, res) {
-    const {id, nome, email, telefone} = req.body;
-
+    const {id, nome, email, telefone, rua, numero, bairro, cidade, estado, cep} = req.body;
+    
     if(!id){
         return res.status(400).json({
             success: false,
@@ -94,9 +94,17 @@ async function UpdateC(req, res) {
         });
     }
 
-    const dados = {id, nome, email, telefone};   
+    if(!rua || !numero || !bairro || !cidade || !estado || !cep) {
+        return res.status(400).json({
+            success: false,
+            message: 'Preencha todos os campos de endereço'
+        });
+    }
+
+    const dados = {id, nome, email, telefone};
+    const endereco = {rua, numero, bairro, cidade, estado, cep};
     try {
-        const response = await Update(dados);
+        const response = await Update(dados, endereco);
         res.status(200).json({
             success: true,
             data: response

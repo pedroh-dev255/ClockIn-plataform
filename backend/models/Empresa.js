@@ -78,6 +78,25 @@ const Empresa = {
             throw new Error('Erro ao atualizar empresa: ' + error.message);
         }
 
+    },
+
+    async UpdateEndereco(id, endereco){
+        if (!id) {
+            throw new Error('ID é obrigatório');
+        }
+        const { rua, numero, bairro, cidade, estado, cep } = endereco;
+        if (!rua || !numero || !bairro || !cidade || !estado || !cep) {
+            throw new Error('Todos os campos de endereço são obrigatórios');
+        }
+        try {
+            const response = await db.query(
+                'UPDATE endereco SET rua = ?, numero = ?, bairro = ?, cidade = ?, estado = ?, cep = ? WHERE id_empresa = ?',
+                [rua, numero, bairro, cidade, estado, cep, id]);
+            return response;
+        } catch (error) {
+            throw new Error('Erro ao atualizar endereço: ' + error.message);
+        }
+
     }
 
 };

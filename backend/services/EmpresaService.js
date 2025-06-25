@@ -23,9 +23,15 @@ async function GetByEmpresaId(id) {
     return rows;
 }
 
-async function Update(dados) {
+async function Update(dados, endereco) {
     const result = await Empresa.Update(dados);
-    return result;
+    const resultEndereco = await Empresa.UpdateEndereco(dados.id,endereco);
+
+    if (result && resultEndereco) {
+        return result && resultEndereco;
+    }
+
+    return result || resultEndereco;
 }
 
 
