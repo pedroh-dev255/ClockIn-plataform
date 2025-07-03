@@ -23,7 +23,7 @@ async function loginController(req, res) {
     if (!email || !password) {
         return res.status(400).json({
             success: false,
-            message: 'Please enter both login and password'
+            message: 'missing_credentials'
         });
     }
 
@@ -33,7 +33,7 @@ async function loginController(req, res) {
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: 'Email ou senha Incorretos'
+                message: 'incorrect_credentials'
             });
         }
 
@@ -56,7 +56,7 @@ async function loginController(req, res) {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: 'Error fetching users'
+            message: 'error_fetching'
         });
     }
 }
@@ -91,7 +91,7 @@ async function resetSenhaController(req, res) {
     const { senha } = req.body;
     
     if (!senha || senha.length < 8) {
-        return res.status(400).json({ success: false, message: 'Senha inválida' });
+        return res.status(400).json({ success: false, message: 'invalid_password' });
     }
 
 
@@ -104,9 +104,9 @@ async function resetSenhaController(req, res) {
             throw new Error('Erro ao redefinir a senha do usuário');
         }
 
-        return res.json({
-            success: true, message:
-            'Senha redefinida com sucesso!'
+        return res.status(200).json({
+            success: true,
+            message:'Senha redefinida com sucesso!'
         });
     } catch (err) {
         console.error(err);

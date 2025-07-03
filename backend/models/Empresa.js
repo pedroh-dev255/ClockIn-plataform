@@ -51,6 +51,7 @@ const Empresa = {
             await Config.Create(conn, id, "toleranciaGeral", "10");
             await Config.Create(conn, id, "maximo50", "180");
             await Config.Create(conn, id, "dtFechamento", "25");
+            await Config.Create(conn, id, "fotoEnable", "0");
             
             await conn.commit();
             return "Empresa Criada e Configurações padões definidas";
@@ -97,7 +98,19 @@ const Empresa = {
             throw new Error('Erro ao atualizar endereço: ' + error.message);
         }
 
-    }
+    },
+
+    async getConfigs (id) {
+        if (!id) {
+            throw new Error('ID é obrigatório');
+        }
+        try {
+            const [response] = await db.query('SELECT * FROM configs WHERE id_empresa = ?', [id]);
+            return response;
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    },
 
 };
 

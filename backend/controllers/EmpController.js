@@ -1,4 +1,4 @@
-const { Create, GetAll, GetById, GetByEmpresaId, Update } = require('../services/EmpresaService');
+const { Create, GetAll, GetById, GetByEmpresaId, Update, getConfigs } = require('../services/EmpresaService');
 
 async function GetAllC(req,res) {
     try {
@@ -118,6 +118,35 @@ async function UpdateC(req, res) {
     }
 }
 
+async function getConfigsC(req, res) {
+    const id = req.query.id;
+
+    if(!id){
+        return res.status(400).json({
+            success: false,
+            message: 'ID é obrigatório'
+        });
+    }
+
+    try {
+        const response = await getConfigs(id);
+        res.status(200).json({
+            success: true,
+            data: response
+        });
+
+        
+    } catch (error) {
+        console.error(error);
+
+         res.status(500).json({
+            success: false,
+            message: 'Error getting settings: ' + error.message
+        });
+    }
+    
+}
+
 async function GetByEmpresaIdC(req, res) {
     const { id } = req.body;
     if (!id) {
@@ -150,5 +179,6 @@ module.exports = {
     CreateC,
     GetByEmpresaIdC,
     GetByIdC,
-    UpdateC
+    UpdateC,
+    getConfigsC
 }

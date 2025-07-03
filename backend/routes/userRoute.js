@@ -14,7 +14,10 @@ router.post('/login', loginController );
 router.post('/esqueci-senha', esqueciSenhaController);
 
 router.get('/validadeEsqueciToken/:token', validarResetToken, (req, res) => {
-    return res.json({ success: true, message: 'Token válido' });
+    return res.status(200).json({
+        success: true,
+        message: 'Token válido'
+    });
 });
 
 router.post('/resetarSenha/:token', validarResetToken, resetSenhaController);

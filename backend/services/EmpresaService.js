@@ -34,12 +34,21 @@ async function Update(dados, endereco) {
     return result || resultEndereco;
 }
 
+async function getConfigs(id) {
+    try {
+        const configs = await Empresa.getConfigs(id);
+        return configs;
+    } catch (error) {
+        throw new Error('Erro ao buscar configurações da empresa: ' + error.message);
+    }
+}
 
 module.exports = {
     GetAll,
     GetById,
     Create,
     GetByEmpresaId,
-    Update
+    Update,
+    getConfigs
 
 };
