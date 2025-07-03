@@ -1,15 +1,23 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../../../config';
 
 export async function getConfigs(idEmpresa: number) {
+    console.log('getting configs');
     try {
+        
         const token = localStorage.getItem('token');
-        const response = await axios.get(`${API_URL}/configs/${idEmpresa}`, {
+        const response = await axios.get(`${API_URL}/api/emp/getConfigs`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
+            params: {
+                id: idEmpresa
+            }
         });
+
+        console.log('configs ', response.data);
+
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar configurações:', error);

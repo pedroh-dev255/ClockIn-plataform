@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
@@ -62,14 +62,14 @@ export default function ConfigsPanel() {
                     navigate('/login');
                     return;
                 }
-
-                if (response && typeof response === 'object') {
-                    // Transforma o array de configs em um objeto mais fácil de manipular
-                    const configsObj = response.reduce((acc: any, curr: any) => {
+                if (response && response.success && Array.isArray(response.data)) {
+                    const configsObj = response.data.reduce((acc: any, curr: any) => {
                         acc[curr.nome] = curr.valor;
                         return acc;
                     }, {});
                     setConfigs(configsObj);
+                } else {
+                    throw new Error('Formato de resposta inválido');
                 }
             } catch (error) {
                 console.error('Erro ao carregar configurações:', error);
@@ -131,6 +131,8 @@ export default function ConfigsPanel() {
                 return 'Horas extras que podem ser pagas como 50% (horas)';
             case 'dtFechamento':
                 return 'Dia do mês para fechamento do ponto';
+            case 'fotoEnable':
+                return 'Registrar foto junto ao ponto';
             default:
                 return configName;
         }
@@ -142,14 +144,14 @@ export default function ConfigsPanel() {
                 <h2 style={styles.title}>Configurações do Ponto</h2>
                 <p style={styles.subtitle}>Gerencie as configurações do sistema de ponto</p>
                 <div style={styles.grid}>
-                    <h3 style={styles.label}>Data de Fechamento</h3>     
-                    <p style={styles.value}>25</p>
-                    <h3 style={styles.label}>Tolerância Geral</h3>
-                    <p style={styles.value}>10 minutos</p>
-                    <h3 style={styles.label}>Tolerância por ponto</h3>
-                    <p style={styles.value}>5 minutos</p>
-                    <h3 style={styles.label}>Máximo de Horas Extras 50%</h3>
-                    <p style={styles.value}>2 horas</p>
+                    {Object.keys(configs).map((configName) => (
+                        <React.Fragment key={configName}>
+                            <h3 style={styles.label}>{getConfigDescription(configName)}</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <p style={styles.value}>{configs[configName] == 'disable' ? 'Desativado' : configs[configName] == 'enable' ? 'Ativado' : `${configs[configName]} minutos` }</p>
+                                </div>
+                        </React.Fragment>
+                    ))}
                 </div>
             </div>
             {loading && <Loader />}

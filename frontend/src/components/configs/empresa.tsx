@@ -121,23 +121,23 @@ export default function EmpresaPanel() {
 
                         <form
                             onSubmit={async (e) => {
-                            e.preventDefault();
-                            const confirm = window.confirm("Tem certeza que deseja editar os dados da empresa?");
-                            if (!confirm) return;
-                            setLoading(true);
-                            try {
-                                const response = await Update(formData);
-                                if (response) {
-                                toast.success('Dados da empresa atualizados com sucesso!');
-                                setEmpresa(formData); // atualiza o estado principal
-                                setEdit(false);
+                                e.preventDefault();
+                                const confirm = window.confirm("Tem certeza que deseja editar os dados da empresa?");
+                                if (!confirm) return;
+                                setLoading(true);
+                                try {
+                                    const response = await Update(formData);
+                                    if (response) {
+                                    toast.success('Dados da empresa atualizados com sucesso!');
+                                    setEmpresa(formData); // atualiza o estado principal
+                                    setEdit(false);
+                                    }
+                                } catch (error) {
+                                    console.error('Erro ao editar dados da empresa:', error);
+                                    toast.error('Erro ao editar dados da empresa');
+                                } finally {
+                                    setLoading(false);
                                 }
-                            } catch (error) {
-                                console.error('Erro ao editar dados da empresa:', error);
-                                toast.error('Erro ao editar dados da empresa');
-                            } finally {
-                                setLoading(false);
-                            }
                             }}
                         >
                             <br />

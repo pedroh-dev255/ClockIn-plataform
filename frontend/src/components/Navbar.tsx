@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { FaHome, FaCogs, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import icon from '../assets/fav.png';
+import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const items = [
-        { label: 'Home', icon: <FaHome />, path: '/' },
-        { label: 'Configurações', icon: <FaCogs />, path: '/configs' }
+        { label: t('navbar.home'), icon: <FaHome />, path: '/' },
+        { label: t('navbar.config'), icon: <FaCogs />, path: '/configs' }
     ];
 
     const handleNavClick = (path: string) => {

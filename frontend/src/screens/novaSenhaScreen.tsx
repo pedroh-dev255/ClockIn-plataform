@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams  } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 //componentes
 import Loader from '../components/Loader';
@@ -18,14 +19,17 @@ export default function LoginPage() {
     const [checkingAuth, setCheckingAuth] = useState(true);
     const [tokenValido, setTokenValido] = useState(false);
 
+
     const { token } = useParams();
     console.log('Token recebido:', token);
     console.log(useParams());
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     useEffect(() => {
         const validar = async () => {
             if (!token) {
+                setLoading(false);
                 toast.error('Token inválido!');
                 navigate('/login');
                 return;
@@ -33,9 +37,11 @@ export default function LoginPage() {
 
             const valido = await validateResetToken(token);
             if (valido) {
+                setLoading(false);
                 setTokenValido(true);
             } else {
-                toast.error('Token expirado ou inválido');
+                setLoading(false);
+                toast.error(t('forgotpasswordScreen.toast.expired_token'));
                 navigate('/login');
             }
             setLoading(false);
@@ -56,7 +62,7 @@ export default function LoginPage() {
 
             const isValid = await validate(token);
             if (isValid) {
-                toast.success('Você já está logado!');
+                toast.success(t('forgotpasswordScreen.toast.already_logged'));
                 navigate('/');
             } else {
                 localStorage.removeItem('token');
@@ -72,24 +78,24 @@ export default function LoginPage() {
         e.preventDefault();
 
         if (senha.length < 8 || senha2.length < 8) {
-            return toast.warning('A senha deve ter no mínimo 8 caracteres');
+            return toast.warning(t('forgotpasswordScreen.toast.password_short'));
         }
         if (senha !== senha2) {
-            return toast.warning('As senhas não conferem');
+            return toast.warning(t('forgotpasswordScreen.toast.password_mismatch'));
         }
 
         setLoading(true);
         const result = await resetPassword(token!, senha);
         if (result.success) {
-            toast.success('Senha redefinida com sucesso!');
+            toast.success(t('forgotpasswordScreen.toast.success'));
             navigate('/login');
         } else {
-            toast.error(result.message || 'Erro ao redefinir senha');
+            toast.error(result.message || t('forgotpasswordScreen.toast.error'));
         }
         setLoading(false);
     };
 
-    if (checkingAuth) {
+    if ( loading ) {
         return <Loader />;
     }
 
@@ -157,10 +163,10 @@ export default function LoginPage() {
         <>
             <div style={styles.container}>
                 <div style={styles.card}>
-                    <h2 style={styles.title}>Reculperação de Senha</h2>
+                    <h2 style={styles.title}>{t('forgotpasswordScreen.title')}</h2>
                     <form onSubmit={handleSubmit}>
 
-                        <label htmlFor="senha" style={styles.label}>Senha</label>
+                        <label htmlFor="senha" style={styles.label}>{t('forgotpasswordScreen.password1')}</label>
                         <input
                             id="senha"
                             type="password"
@@ -172,7 +178,7 @@ export default function LoginPage() {
                         />
 
 
-                        <label htmlFor="senha2" style={styles.label}>Confirme a Senha</label>
+                        <label htmlFor="senha2" style={styles.label}>{t('forgotpasswordScreen.password2')}</label>
                         <input
                             id="senha2"
                             type="password"
@@ -193,7 +199,7 @@ export default function LoginPage() {
                                 (e.currentTarget.style.backgroundColor = styles.button.backgroundColor ?? '#2563eb')
                             }
                         >
-                            Confirmar
+                            {t('forgotpasswordScreen.submit')}
                         </button>
                     </form>
                     <p style={styles.footer}>© {new Date().getFullYear()} ClockIn!</p>

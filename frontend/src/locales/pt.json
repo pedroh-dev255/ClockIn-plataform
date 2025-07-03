@@ -1,0 +1,82 @@
+{
+    "NotFound": {
+        "message": "Rota não encontrada!"
+    },
+    "login": {
+        "login_title": "Entrar no Sistema",
+        "email": "Email",
+        "email_placeholder": "seu@email.com",
+        "password": "Senha",
+        "submit": "Entrar",
+        "forgot_password": "Esqueci minha Senha",
+        "toast": {
+            "error": "Erro ao realizar login.",
+            "login_success": "Login realizado com sucesso",
+            "reset_required": "Por favor, redefina sua senha",
+            "error_fields": "Preencha todos os campos",
+            "invalid_email": "E-mail inválido",
+            "password_short": "Senha deve ter pelo menos 8 caracteres",
+            "server_error": "Erro ao conectar-se ao servidor. Contate o suporte.",
+            "incorrect_credentials": "Email ou senha incorretos.",
+            "missing_credentials": "Email e senha são obrigatórios",
+            "admin_only": "Apenas administradores podem acessar o sistema"
+        }
+    },
+    "forgotpasswordModal": {
+        "title":"Redefinir Acesso",
+        "email": "Email",
+        "email_placeholder": "seu@email.com",
+        "submit": "Enviar Instruções",
+        "footer": "Você receberá um link para redefinir sua senha.",
+        "toast": {
+            "email_send": "Instruções enviadas para seu e-mail.",
+            "error_fields": "Por favor, preencha o campo de email",
+            "warning": "Erro ao enviar email.",
+            "server_error": "Erro ao conectar-se ao servidor. Tente novamente."
+        }
+
+    },
+    "forgotpasswordScreen": {
+        "title": "Reculperação de Senha",
+        "password1": "Senha",
+        "password2": "Confirme a Senha",
+        "submit": "Confirmar",
+
+        "toast": {
+            "invalid_token": "Token inválido!",
+            "expired_token": "Token expirado ou inválido",
+            "password_mismatch": "Senhas não conferem",
+            "password_short": "Senha deve ter pelo menos 8 caracteres",
+            "success": "Senha redefinida com sucesso!",
+            "error": "Erro ao redefinir senha",
+            "already_logged": "Você já está logado."
+
+        }
+    },
+
+    "navbar": {
+        "home": "Home",
+        "config": "Configurações"
+    },
+
+    "home": {
+
+    },
+
+    "configs": {
+        "navbar": {
+            "func": "Funcionarios",
+            "business": "Empresa",
+            "configs": "Configurações do ponto"
+        }
+    },
+
+    "api": {
+        "login":{
+            "admin_only": "Apenas administradores podem acessar o sistema",
+            "server_error": "Erro ao se concectar-se com o servidor! Contate o Suporte Tecnico",
+            "missing_credentials": "Email e senha são obrigatórios"
+        }
+    }
+  
+}

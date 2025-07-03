@@ -47,6 +47,9 @@ export default function DashboardPage() {
             <Navbar/>
             
             <div style={styles.container}>
+                <div style={styles.content}>
+
+                </div>
                 
             </div>
 
@@ -63,5 +66,18 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+    } as CSSProperties,
+
+    content: {
+        width: '100%',
+        maxWidth: '1400px', // Ocupa mais espaço em telas grandes
+        height: 'calc(100vh - 110px)', // Deixa um espaço do fundo
+        backgroundColor: '#e8f9eb',
+        borderRadius: '16px',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        marginTop: '70px',
     } as CSSProperties,
 };

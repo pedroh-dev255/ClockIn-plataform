@@ -1,0 +1,79 @@
+{
+    "NotFound": {
+        "message": "Route not found!"
+    },
+    "login": {
+        "login_title": "Login to the System",
+        "email": "Email",
+        "email_placeholder": "your@email.com",
+        "password": "Password",
+        "submit": "Login",
+        "forgot_password": "Forgot my Password",
+        "toast": {
+            "error": "Error during login.",
+            "login_success": "Login successful",
+            "reset_required": "Please reset your password",
+            "error_fields": "Fill in all fields",
+            "invalid_email": "Invalid email",
+            "password_short": "Password must be at least 8 characters",
+            "server_error": "Error connecting to the server. Contact support.",
+            "incorrect_credentials": "Incorrect email or password.",
+            "missing_credentials": "Email and password are required",
+            "admin_only": "Only administrators can access the system"
+        }
+    },
+    "forgotpasswordModal": {
+        "title": "Reset Access",
+        "email": "Email",
+        "email_placeholder": "your@email.com",
+        "submit": "Send Instructions",
+        "footer": "You will receive a link to reset your password.",
+        "toast": {
+            "email_send": "Instructions sent to your email.",
+            "error_fields": "Please fill in the email field",
+            "warning": "Error sending email.",
+            "server_error": "Error connecting to the server. Try again."
+        }
+    },
+    "forgotpasswordScreen": {
+        "title": "Password Recovery",
+        "password1": "Password",
+        "password2": "Confirm Password",
+        "submit": "Confirm",
+        "toast": {
+            "invalid_token": "Invalid token!",
+            "expired_token": "Token expired or invalid",
+            "password_mismatch": "Passwords do not match",
+            "password_short": "Password must be at least 8 characters",
+            "success": "Password reset successfully!",
+            "error": "Error resetting password",
+            "already_logged": "You are already logged in."
+        }
+    },
+
+    "navbar": {
+        "home": "Home",
+        "config": "Settings"
+    },
+
+    "home": {
+
+    },
+
+    "configs": {
+        "navbar": {
+            "func": "Employees",
+            "business": "Company",
+            "configs": "ClockIn Settings"
+        }
+    },
+
+
+    "api": {
+        "login": {
+            "admin_only": "Only administrators can access the system",
+            "server_error": "Error connecting to the server! Contact Technical Support",
+            "missing_credentials": "Email and password are required"
+        }
+    }
+}

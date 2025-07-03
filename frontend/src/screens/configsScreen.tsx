@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 //api
 import { validate } from "../api/validateToken";
@@ -17,6 +18,7 @@ import ConfigsPanel from '../components/configs/configPonto';
 
 export default function ConfigsScreen() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const [activeTab, setActiveTab] = useState<'funcionarios' | 'empresa' | 'ponto'>('funcionarios');
@@ -60,19 +62,19 @@ export default function ConfigsScreen() {
                             onClick={() => setActiveTab('funcionarios')}
                             style={activeTab === 'funcionarios' ? styles.activeTab : styles.tab}
                         >
-                            Funcionários
+                            {t('configs.navbar.func')}
                         </button>
                         <button
                             onClick={() => setActiveTab('empresa')}
                             style={activeTab === 'empresa' ? styles.activeTab : styles.tab}
                         >
-                            Empresa
+                            {t('configs.navbar.business')}
                         </button>
                         <button
                             onClick={() => setActiveTab('ponto')}
                             style={activeTab === 'ponto' ? styles.activeTab : styles.tab}
                         >
-                            Configurações do Ponto
+                            {t('configs.navbar.configs')}
                         </button>
                     </div>
 

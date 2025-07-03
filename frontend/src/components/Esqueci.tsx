@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { API_URL } from '../../config';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 const styles = {
     overlay: {
@@ -87,12 +88,13 @@ interface EsqueciProps {
 
 export default function Esqueci({ onClose, setLoading }: EsqueciProps) {
     const [email, setEmail] = useState('');
+    const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!email) {
-            toast.warning('Por favor, preencha o campo de email.');
+            toast.warning(t('forgotpasswordModal.toast.error_fields'));
             return;
         }
 
@@ -110,16 +112,16 @@ export default function Esqueci({ onClose, setLoading }: EsqueciProps) {
             const data = await response.json();
 
             if (data.success) {
-                toast.success('Instruções enviadas para seu e-mail.');
+                toast.success(t('forgotpasswordModal.toast.email_send'));
                 setEmail('');
             } else {
-                toast.warning(data.message || 'Erro ao enviar email.');
+                toast.warning(data.message || t('forgotpasswordModal.toast.warning'));
             }
 
             onClose?.();
         } catch (error) {
             console.error('Erro ao enviar email:', error);
-            toast.error('Erro ao conectar. Tente novamente.');
+            toast.error(t('forgotpasswordModal.toast.server_error'));
             onClose?.();
         } finally {
             setLoading(false);
@@ -132,9 +134,9 @@ export default function Esqueci({ onClose, setLoading }: EsqueciProps) {
                 <button style={styles.cancelButton} onClick={onClose}>
                     ✕
                 </button>
-                <h2 style={styles.title}>Redefinir Acesso</h2>
+                <h2 style={styles.title}>{t('forgotpasswordModal.title')}</h2>
                 <form onSubmit={handleSubmit}>
-                    <label htmlFor="email" style={styles.label}>Email</label>
+                    <label htmlFor="email" style={styles.label}>{t('forgotpasswordModal.email')}</label>
                     <input
                         id="email"
                         type="email"
@@ -142,7 +144,7 @@ export default function Esqueci({ onClose, setLoading }: EsqueciProps) {
                         style={styles.input}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="seu@email.com"
+                        placeholder={t('forgotpasswordModal.email_placeholder')}
                     />
                     <button
                         type="submit"
@@ -154,10 +156,10 @@ export default function Esqueci({ onClose, setLoading }: EsqueciProps) {
                             (e.currentTarget.style.backgroundColor = styles.button.backgroundColor || '#2563eb')
                         }
                     >
-                        Enviar Instruções
+                        {t('forgotpasswordModal.submit')}
                     </button>
                 </form>
-                <p style={styles.footer}>Você receberá um link para redefinir sua senha.</p>
+                <p style={styles.footer}>{t('forgotpasswordModal.footer')}</p>
             </div>
         </div>
     );

@@ -19,6 +19,6 @@ export async function resetPassword(token: string, novaSenha: string) {
         });
         return await response.json();
     } catch (error) {
-        return { success: false, message: 'Erro de rede' };
+        return { success: false, message: 'server_error' };
     }
 }

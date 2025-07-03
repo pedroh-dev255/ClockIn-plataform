@@ -9,7 +9,7 @@ const api = axios.create({
 
 export async function login(email: string, password: string)  {
     if(!email || !password) {
-        throw new Error('Email and password are required');
+        throw new Error('missing_credentials');
     }
     try {
         const response = await api.post('/', {
@@ -19,7 +19,7 @@ export async function login(email: string, password: string)  {
 
         if(response.data.success === true){
             if (response.data.userData.tipo !== 'admin') {
-                return { success: false, message: "Apenas administradores podem acessar o sistema" };
+                return { success: false, message: "admin_only" };
             }
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('userData', JSON.stringify(response.data.userData));
@@ -33,6 +33,6 @@ export async function login(email: string, password: string)  {
             return error.response.data; // <-- aqui vem o { success: false, message: "Senha incorreta" }
         }
 
-        return { success: false, message: "Erro ao se concectar-se com o servidor! Contate o Suporte Tecnico" };
+        return;
     }
 }

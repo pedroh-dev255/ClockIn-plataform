@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 
 //componentes
 import Loader from '../components/Loader';
@@ -18,6 +20,7 @@ export default function LoginPage() {
     const [esqueci, setEsqueci] = useState(false);
     const [checkingAuth, setCheckingAuth] = useState(true);
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -47,41 +50,57 @@ export default function LoginPage() {
         setLoading(true);
 
         if (!email || !senha) {
-            toast.warning('Preencha todos os campos');
+            toast.warning(t('login.toast.error_fields'));
             setLoading(false);
             return;
         }
 
         if (!email.includes('@') || !email.includes('.')) {
-            toast.warning('E-mail inválido');
+            toast.warning(t('login.toast.invalid_email'));
             setLoading(false);
             return;
         }
 
-        if(senha !== "PADRAO"){
-            if (senha.length < 8) {
-                toast.warning('Senha deve ter pelo menos 8 caracteres');
-                setLoading(false);
-                return;
-            }
+        
+        if (senha.length < 8) {
+            toast.warning(t('login.toast.password_short'));
+            setLoading(false);
+            return;
         }
+        
 
         const result = await login(email, senha);
         setLoading(false);
 
         if (result) {
             if (result.success === true && result.resetPassword === false) {
-                toast.success('Login realizado com sucesso');
+                toast.success(t('login.toast.login_success'));
                 navigate('/');
             } else if (result.success === true && result.resetPassword === true) {
-                toast.info('Por favor, redefina sua senha');
+                toast.info(t('login.toast.reset_required'));
                 navigate('/reset-password');
 
             }else {
-                toast.error(result.message);
+                switch (result.message) {
+                    case 'incorrect_credentials':
+                        toast.error(t('login.toast.incorrect_credentials'));
+                        break;
+                    case 'missing_credentials':
+                        toast.error(t('login.toast.missing_credentials'));
+                        break;
+
+                    case 'admin_only':
+                        toast.error(t('login.toast.admin_only'));
+                        break;
+
+                    default:
+                        toast.error(t('login.toast.error'));
+                        break;
+                    
+                }
             }
         } else {
-            toast.error("Erro ao conectar ao servidor. Contate o suporte.");
+            toast.error(t('login.toast.server_error'));
         }
     };
 
@@ -153,9 +172,9 @@ export default function LoginPage() {
         <>
             <div style={styles.container}>
                 <div style={styles.card}>
-                    <h2 style={styles.title}>Entrar no Sistema</h2>
+                    <h2 style={styles.title}>{t('login.login_title')}</h2>
                     <form onSubmit={handleSubmit}>
-                        <label htmlFor="email" style={styles.label}>Email</label>
+                        <label htmlFor="email" style={styles.label}>{t('login.email')}</label>
                         <input
                             id="email"
                             type="email"
@@ -163,10 +182,10 @@ export default function LoginPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             style={styles.input}
-                            placeholder="seu@email.com"
+                            placeholder={t('login.email_placeholder')}
                         />
 
-                        <label htmlFor="senha" style={styles.label}>Senha</label>
+                        <label htmlFor="senha" style={styles.label}>{t('login.password')}</label>
                         <input
                             id="senha"
                             type="password"
@@ -187,7 +206,7 @@ export default function LoginPage() {
                                 (e.currentTarget.style.backgroundColor = styles.button.backgroundColor ?? '#2563eb')
                             }
                         >
-                            Entrar
+                           {t('login.submit')}
                         </button>
                     </form>
                     <p style={styles.footer}>© {new Date().getFullYear()} ClockIn!</p>
@@ -196,7 +215,7 @@ export default function LoginPage() {
                             style={{ ...styles.footer, color: '#2563eb', cursor: 'pointer', margin: 0 }}
                             onClick={() => setEsqueci(true)}
                         >
-                            Esqueci minha Senha
+                            {t('login.forgot_password')}
                         </a>
                     </div>
                 </div>

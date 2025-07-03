@@ -2,12 +2,14 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 export default function NotFoundRedirect() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
-    toast.error('Rota não encontrada!');
+    toast.error(t('NotFound.message'));
     navigate('/', { replace: true });
   }, [navigate]);
 
