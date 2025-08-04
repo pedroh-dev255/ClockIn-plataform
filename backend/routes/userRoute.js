@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const middleware = require('../middlewares/authMiddleware.js');
 const validarResetToken = require('../middlewares/validarResetToken');
-
+const { loginRateLimiter } = require('../middlewares/loginRateLimiter');
 
 const { getAll, loginController, Register, desligamento, resetSenhaController } = require('../controllers/UsersController.js');
 const { esqueciSenhaController } = require('../controllers/esqueciSenhaController.js');
 
 router.get('/', middleware, getAll );
 
-router.post('/login', loginController );
+router.post('/login', loginRateLimiter, loginController );
 
 router.post('/esqueci-senha', esqueciSenhaController);
 

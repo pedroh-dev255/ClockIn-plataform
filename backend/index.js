@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const regisRoutes  = require('./routes/regisRoute');
 const userRoutes = require('./routes/userRoute');
 const empRoutes = require('./routes/empRoute');
+const pontoRoutes = require('./routes/pontoRoute');
 const authMiddleware = require('./middlewares/authMiddleware');
 
 //configs
@@ -31,6 +32,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/registros', regisRoutes);
 
 app.use('/api/emp', empRoutes);
+
+app.use('/api/ponto', pontoRoutes);
 
 app.use('/api/validateToken', authMiddleware, (req, res) => {
     res.status(200).json({

@@ -7,6 +7,11 @@ async function GetAll() {
     return rows;
 }
 
+async function getId(token) {
+    const id = await Empresa.getId(token);
+    return id;
+}
+
 async function GetById(id) {
     const rows = await Empresa.getById(id);
 
@@ -44,6 +49,7 @@ async function getConfigs(id) {
 }
 
 module.exports = {
+    getId,
     GetAll,
     GetById,
     Create,

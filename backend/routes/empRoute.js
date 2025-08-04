@@ -12,7 +12,7 @@ router.post('/updateEmp', middleware, UpdateC);
 
 router.get('/getByEmpresaId', middleware, GetByIdC);
 
-router.post('/GetFuncionarios', middleware, GetByEmpresaIdC);
+router.get('/GetFuncionarios', middleware, GetByEmpresaIdC);
 
 router.get('/getConfigs', middleware, getConfigsC)
 

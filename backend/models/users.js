@@ -7,6 +7,11 @@ const User = {
         return rows;
     },
 
+    async getUserByToken(token){
+        const [rows] = await db.query('SELECT * FROM users WHERE token = ?', [token]);
+        return rows[0];
+    },
+
     async getByEmail(email) {
         const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
         return rows[0];
@@ -39,6 +44,14 @@ const User = {
             
         }
         
+    },
+
+    async findToken(token){
+        const [rows] = await db.query('SELECT * FROM login_tokens WHERE token = ?', [token]);
+        if(rows[0]){
+            return true;
+        }
+        return false;
     },
 
     async getByResetToken(token) {
@@ -110,9 +123,26 @@ const User = {
         if (!passwordMatch) {
             return null;
         }
-        // Remove password before returning user object
-        const { password: _, senha: __, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+
+        
+        // Remove password and token before returning user object
+        const { senha, ...userWithoutPasswordAndToken } = user;
+        
+        return userWithoutPasswordAndToken;
+    },
+
+    async updateToken(id, token, expiresAt) {
+        // expiresIn padrão "6h"
+        
+
+        console.log('Updating token for user:', id, 'with expiration:', expiresAt);
+
+        const result = await db.query('INSERT INTO login_tokens(id_usuario,token) values (?, ?)', [id, token]);
+        if (result[0].affectedRows === 0) {
+            return null;
+        }
+        return { id, token };
+
     },
 
     async UpdateSenha(id, password) {

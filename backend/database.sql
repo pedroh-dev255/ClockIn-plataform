@@ -96,3 +96,20 @@ CREATE TABLE clockin.saldo_diario(
     PRIMARY KEY (id),
     FOREIGN KEY (id_usuario) REFERENCES clockin.users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE clockin.login_tokens(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES clockin.users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE login_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ip VARCHAR(45) NOT NULL,
+    email VARCHAR(255),
+    tentativa_sucesso VARCHAR(10) NOT NULL DEFAULT 'false',
+    data_tentativa DATETIME DEFAULT CURRENT_TIMESTAMP,
+    user_agent TEXT
+);

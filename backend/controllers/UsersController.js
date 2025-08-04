@@ -1,4 +1,5 @@
-const { getUserId, getAllUsers, login, createUser, desligamentoUser, ResetSenha } = require('../services/UsersService.js');
+const { getUserId, getAllUsers, login, createUser, desligamentoUser, ResetSenha, updateToken } = require('../services/UsersService.js');
+const { registerLoginAttempt } = require('../middlewares/loginRateLimiter');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -21,6 +22,7 @@ async function getAll(req, res) {
 async function loginController(req, res) {
     const {email, password} = req.body;
     if (!email || !password) {
+        registerLoginAttempt(req, 'false');
         return res.status(400).json({
             success: false,
             message: 'missing_credentials'
@@ -31,19 +33,36 @@ async function loginController(req, res) {
         const user = await login(email, password);
 
         if (!user) {
+            registerLoginAttempt(req, 'false');
             return res.status(401).json({
                 success: false,
                 message: 'incorrect_credentials'
             });
         }
 
+        const expiresIn = parseInt(process.env.EXPIRATION_TIME, 10);
+        const expiresAt = new Date(Date.now() + expiresIn * 1000); 
+        console.log('Token expires at:', expiresAt);
+        console.log('horario atual:', new Date());
         // Gera o token JWT
         const token = jwt.sign(
             { id: user.id, email: user.email },
             process.env.JWT_SECRET,
-            { expiresIn: '6h' } 
+            { expiresIn }
         );
 
+        // Passa o novo token para o usuário
+        const updatedUser = await updateToken(user.id, token, expiresAt);
+
+        if (!updatedUser) {
+            
+            return res.status(500).json({
+                success: false,
+                message: 'error_updating_token'
+            });
+        }
+
+        registerLoginAttempt(req, 'true');
 
         res.status(200).json({
             success: true,
@@ -54,6 +73,7 @@ async function loginController(req, res) {
         
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             success: false,
             message: 'error_fetching'

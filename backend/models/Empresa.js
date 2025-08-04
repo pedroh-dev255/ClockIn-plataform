@@ -3,13 +3,18 @@ const Config = require('./Configs.js');
 
 
 const Empresa = {
+    async getId(token) {
+        const [rows] = await db.query('select users.id_empresa from users INNER JOIN login_tokens ON users.id = login_tokens.id_usuario WHERE login_tokens.token = ?', [token]);
+        return rows[0].id_empresa;
+    },
+
     async getAll() {
         const rows = await db.query('SELECT * FROM empresa');
         return rows;
     },
 
     async getById(id) {
-        const [rows] = await db.query('SELECT *, (select count(*) from clockin.users where users.id_empresa = empresa.id AND status = "ativo") as n_funcionarios FROM empresa INNER JOIN endereco ON endereco.id_empresa = empresa.id WHERE empresa.id = ?', [id]);
+        const [rows] = await db.query('SELECT *, (select count(*) from users where users.id_empresa = empresa.id AND status = "ativo") as n_funcionarios FROM empresa INNER JOIN endereco ON endereco.id_empresa = empresa.id WHERE empresa.id = ?', [id]);
         return rows[0];
     },
 

@@ -13,6 +13,17 @@ async function getUserId(id) {
     }
 }
 
+
+async function updateToken(id, token, expiresAt) {
+    try {
+        const user = await User.updateToken(id, token, expiresAt);
+        return user;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
 async function getAllUsers(){
     try {
         const users = await User.getAll();
@@ -69,5 +80,6 @@ module.exports = {
     login,
     createUser,
     ResetSenha,
-    desligamentoUser
+    desligamentoUser,
+    updateToken
 };

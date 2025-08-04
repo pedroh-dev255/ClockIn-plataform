@@ -1,4 +1,4 @@
-const { Create, GetAll, GetById, GetByEmpresaId, Update, getConfigs } = require('../services/EmpresaService');
+const { getId, Create, GetAll, GetById, GetByEmpresaId, Update, getConfigs } = require('../services/EmpresaService');
 
 async function GetAllC(req,res) {
     try {
@@ -50,9 +50,10 @@ async function CreateC(req, res) {
 }
 
 async function GetByIdC(req, res) {
-    // http://localhost:3500/api/emp/getByEmpresaId?id=1
-    
-    const id = req.query.id;
+    // pega o id da empresa pelo token do usuário
+    token = req.headers.authorization.split(' ')[1];
+    id = await getId(token);
+
     if (!id) {
         return res.status(400).json({
             success: false,
@@ -78,7 +79,11 @@ async function GetByIdC(req, res) {
 }
 
 async function UpdateC(req, res) {
-    const {id, nome, email, telefone, rua, numero, bairro, cidade, estado, cep} = req.body;
+    // pega o id da empresa pelo token do usuário
+    token = req.headers.authorization.split(' ')[1];
+    id = await getId(token);
+
+    const { nome, email, telefone, rua, numero, bairro, cidade, estado, cep} = req.body;
     
     if(!id){
         return res.status(400).json({
@@ -119,7 +124,9 @@ async function UpdateC(req, res) {
 }
 
 async function getConfigsC(req, res) {
-    const id = req.query.id;
+    // pega o id da empresa pelo token do usuário
+    token = req.headers.authorization.split(' ')[1];
+    id = await getId(token);
 
     if(!id){
         return res.status(400).json({
@@ -148,7 +155,9 @@ async function getConfigsC(req, res) {
 }
 
 async function GetByEmpresaIdC(req, res) {
-    const { id } = req.body;
+    // pega o id da empresa pelo token do usuário
+    token = req.headers.authorization.split(' ')[1];
+    id = await getId(token);
     if (!id) {
         return res.status(400).json({
             success: false,
