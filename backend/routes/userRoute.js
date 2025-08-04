@@ -4,12 +4,14 @@ const middleware = require('../middlewares/authMiddleware.js');
 const validarResetToken = require('../middlewares/validarResetToken');
 const { loginRateLimiter } = require('../middlewares/loginRateLimiter');
 
-const { getAll, loginController, Register, desligamento, resetSenhaController } = require('../controllers/UsersController.js');
+const { getAll, loginController, Register, desligamento, resetSenhaController, logout } = require('../controllers/UsersController.js');
 const { esqueciSenhaController } = require('../controllers/esqueciSenhaController.js');
 
 router.get('/', middleware, getAll );
 
 router.post('/login', loginRateLimiter, loginController );
+
+router.post('/logout', logout);
 
 router.post('/esqueci-senha', esqueciSenhaController);
 

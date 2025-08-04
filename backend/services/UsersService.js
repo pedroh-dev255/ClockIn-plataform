@@ -13,6 +13,17 @@ async function getUserId(id) {
     }
 }
 
+async function logoutService(token) {
+    try {
+
+        const result = await User.removeToken(token);
+        return result;
+    } catch (error) {
+        console.error('Erro ao realizar logout:', error);
+        return null;
+    }
+}
+
 
 async function updateToken(id, token, expiresAt) {
     try {
@@ -78,6 +89,7 @@ module.exports = {
     getUserId,
     getAllUsers,
     login,
+    logoutService,
     createUser,
     ResetSenha,
     desligamentoUser,

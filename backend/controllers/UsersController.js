@@ -1,4 +1,4 @@
-const { getUserId, getAllUsers, login, createUser, desligamentoUser, ResetSenha, updateToken } = require('../services/UsersService.js');
+const { getUserId, getAllUsers, login, createUser, desligamentoUser, ResetSenha, updateToken, logoutService } = require('../services/UsersService.js');
 const { registerLoginAttempt } = require('../middlewares/loginRateLimiter');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -15,6 +15,45 @@ async function getAll(req, res) {
         res.status(500).json({
             success: false,
             message: 'Error fetching users'
+        });
+    }
+}
+
+async function logout(req, res) {
+    if (!req.headers.authorization) {
+        return res.status(400).json({
+            success: false,
+            message: 'Authorization header is missing'
+        });
+    }
+    
+    const token = req.headers.authorization.split(' ')[1];
+    if (!token) {
+        return res.status(400).json({
+            success: false,
+            message: 'Token não fornecido'
+        });
+    }
+
+    try {
+        const result = await logoutService(token);
+
+        if (!result) {
+            return res.status(500).json({
+                success: false,
+                message: 'Erro ao deslogar'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Logout realizado com sucesso'
+        });
+    } catch (error) {
+        console.error('Erro ao realizar logout:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao realizar logout'
         });
     }
 }
@@ -189,8 +228,10 @@ async function getUserById(req, res) {
 module.exports = {
     getAll,
     getUserById,
+    logout,
     loginController,
     Register,
     resetSenhaController,
     desligamento
+
 };
