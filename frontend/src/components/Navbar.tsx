@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import icon from '../assets/fav.png';
 import { useTranslation } from 'react-i18next';
 
+import {logout} from '../api/login';
+
 export default function Navbar() {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation();
@@ -22,8 +24,13 @@ export default function Navbar() {
     };
 
     const handleLogout = async () => {
+        var result = await logout();
+        if (!result) {
+            console.log('Logout failed');
+        }
         localStorage.removeItem('token');
         localStorage.removeItem('userData');
+
         navigate('/login');
     };
 

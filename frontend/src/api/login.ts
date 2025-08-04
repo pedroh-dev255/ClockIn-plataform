@@ -36,3 +36,29 @@ export async function login(email: string, password: string)  {
         return;
     }
 }
+
+export async function logout() {
+    try {
+        const response = await axios.post(
+            `${API_URL}/api/users/logout`,
+            {},
+            {
+                headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
+        return {
+            success: true,
+            message: 'logout_success'
+        };
+    }
+    catch (error) {
+        console.error('Erro ao fazer logout:', error);
+        return { success: false, message: 'logout_error' };
+    }
+}

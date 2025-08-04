@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_URL } from '../../../config';
+import {logout} from '../login';
 
 export const getFuncionarios = async () => {
   try {
@@ -15,8 +16,7 @@ export const getFuncionarios = async () => {
 
     if(response.status == 401){
       console.log('Token inválido');
-      localStorage.removeItem('token');
-      localStorage.removeItem('userData');
+      await logout();
       return false;
     }
     return response.data;
