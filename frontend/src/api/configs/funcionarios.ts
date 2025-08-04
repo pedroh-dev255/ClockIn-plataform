@@ -1,11 +1,10 @@
 import axios from 'axios';
 import { API_URL } from '../../../config';
 
-export const getFuncionarios = async (id: number) => {
+export const getFuncionarios = async () => {
   try {
-    const response = await axios.post(
+    const response = await axios.get(
       `${API_URL}/api/emp/GetFuncionarios`,
-      { id },
       {
         headers: {
           'Content-Type': 'application/json',
@@ -13,13 +12,12 @@ export const getFuncionarios = async (id: number) => {
         }
       }
     );
-    console.log('Funcionários fetched:', response.data);
 
     if(response.status == 401){
-        console.log('Token invalido');
-        localStorage.removeItem('token');
-        localStorage.removeItem('userData');
-        return false;
+      console.log('Token inválido');
+      localStorage.removeItem('token');
+      localStorage.removeItem('userData');
+      return false;
     }
     return response.data;
 
@@ -46,8 +44,6 @@ export const desligamentoHandler = async (formData: FormData) => {
     throw new Error('Dados do funcionário não podem ser nulo ou indefinido');
   }
 
-  console.log('Dados recebidos no desligamentoHandler:', plainData);
-
   const response = await axios.post(
     `${API_URL}/api/users/desligamento`,
     plainData,
@@ -68,8 +64,6 @@ export const cadastroHandler = async (formData: FormData) => {
   formData.forEach((value, key) => {
     plainData[key] = value;
   });
-
-  console.log('Dados recebidos no cadastroHandler:', plainData);
 
   // Agora você pode enviar os dados com axios:
   const response = await axios.post(

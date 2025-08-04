@@ -65,7 +65,7 @@ export default function FuncionariosPanel() {
                     return;
                 }
 
-                const response = await getFuncionarios(parsedUser.id_empresa);
+                const response = await getFuncionarios();
 
                 if (response === false) {
                     toast.error("Token inválido ou expirado");

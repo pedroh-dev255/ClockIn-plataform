@@ -53,6 +53,7 @@
 
     "navbar": {
         "home": "Home",
+        "registers": "Registers",
         "config": "Settings"
     },
 

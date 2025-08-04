@@ -5,22 +5,14 @@ const userData = localStorage.getItem('userData');
 const useRouteLoaderData = userData ? JSON.parse(userData) : { id_empresa: null };
 
 export const getEmpresa = async () => {
-    if (!useRouteLoaderData.id_empresa || isNaN(useRouteLoaderData.id_empresa) || useRouteLoaderData.id_empresa === null) {
-        console.error('ID da empresa não encontrado no userData');
-        return false;
-    }
     try {
         const response = await axios.get(`${API_URL}/api/emp/getByEmpresaId`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            params: {
-                id: useRouteLoaderData.id_empresa
             }
         });
         
-        console.log('Empresa fetched:', response.data);
 
         if (response.status === 401) {
             console.log('Token inválido');

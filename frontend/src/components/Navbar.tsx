@@ -11,6 +11,7 @@ export default function Navbar() {
 
     const items = [
         { label: t('navbar.home'), icon: <FaHome />, path: '/' },
+        { label: t('navbar.registers'), icon: <FaCogs />, path: '/registers'},
         { label: t('navbar.config'), icon: <FaCogs />, path: '/configs' }
     ];
 

@@ -2,21 +2,15 @@ import axios from 'axios';
 
 import { API_URL } from '../../../config';
 
-export async function getConfigs(idEmpresa: number) {
-    console.log('getting configs');
+export async function getConfigs() {
     try {
         
         const token = localStorage.getItem('token');
         const response = await axios.get(`${API_URL}/api/emp/getConfigs`, {
             headers: {
                 Authorization: `Bearer ${token}`,
-            },
-            params: {
-                id: idEmpresa
             }
         });
-
-        console.log('configs ', response.data);
 
         return response.data;
     } catch (error) {

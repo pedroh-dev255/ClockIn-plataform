@@ -45,6 +45,8 @@ export default function ConfigsPanel() {
 
     useEffect(() => {
         const fetchConfigs = async () => {
+            const userDataString = localStorage.getItem('userData'); // ← dentro do efeito
+
             if (!userDataString) return;
 
             setLoading(true);
@@ -55,13 +57,14 @@ export default function ConfigsPanel() {
                     return;
                 }
 
-                const response = await getConfigs(parsedUser.id_empresa);
+                const response = await getConfigs();
 
                 if (response === false) {
                     toast.error("Token inválido ou expirado");
                     navigate('/login');
                     return;
                 }
+
                 if (response && response.success && Array.isArray(response.data)) {
                     const configsObj = response.data.reduce((acc: any, curr: any) => {
                         acc[curr.nome] = curr.valor;
@@ -80,7 +83,8 @@ export default function ConfigsPanel() {
         };
 
         fetchConfigs();
-    }, [userDataString]);
+    }, [navigate]);
+
 
     const handleEditClick = (configName: string) => {
         setEditingConfig(configName);
